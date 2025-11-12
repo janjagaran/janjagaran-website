@@ -153,10 +153,10 @@ const SidebarFinance = () => {
                 />
               </Link>
               <div className="flex-1">
-                <Link to={`/${item.slug}`} className="block font-medium text-gray-800 hover:text-red-500 line-clamp-2">
+                <Link to={`/${item.slug}`} className="block font-bold text-black-700 hover:text-red-500 line-clamp-2">
                   {item.title}
                 </Link>
-                <p className="text-[11px] sm:text-xs text-gray-500 mt-1 line-clamp-2">
+                <p className="text-[11px] sm:text-xs text-gray-600 mt-1 line-clamp-2">
                   {item.description}
                 </p>
                 <p className="text-[10px] text-gray-400 mt-1">

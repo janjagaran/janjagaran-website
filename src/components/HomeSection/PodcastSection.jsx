@@ -96,7 +96,7 @@ const PodcastSection = () => {
                   Miscellaneous ·{" "}
                   {new Date(item.publishedAt).toLocaleDateString()}
                 </p>
-                <h4 className="text-sm md:text-base font-medium leading-snug text-gray-800 group-hover:text-red-500 transition line-clamp-2">
+                <h4 className="text-sm md:text-base font-bold leading-snug text-black-700 group-hover:text-red-500 transition line-clamp-2">
                   {item.title}
                 </h4>
                 <p className="text-xs text-gray-500 line-clamp-2">

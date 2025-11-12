@@ -396,7 +396,7 @@ const HealthSection = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
               {/* Overlay Text */}
               <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-                <h3 className="text-white text-lg sm:text-xl font-semibold leading-snug mb-2 drop-shadow-md group-hover:text-red-400 transition-colors duration-300">
+                <h3 className="text-white text-lg sm:text-xl font-bold leading-snug mb-2 drop-shadow-md group-hover:text-red-400 transition-colors duration-300">
                   {featured.title}
                 </h3>
                 {featured.description && (
@@ -431,7 +431,7 @@ const HealthSection = () => {
                 <p className="text-xs text-gray-400 mb-1">
                   Aparadh • {new Date(item.publishedAt).toLocaleDateString()}
                 </p>
-                <h4 className="text-sm sm:text-base font-medium leading-snug text-gray-800 group-hover:text-red-500 transition line-clamp-2">
+                <h4 className="text-sm sm:text-base font-bold leading-snug text-black-800 group-hover:text-red-500 transition line-clamp-2">
                   {item.title}
                 </h4>
               </div>
