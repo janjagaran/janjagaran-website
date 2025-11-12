@@ -13,15 +13,19 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [
-    react(),        // ✅ Required for React JSX
-    tailwindcss(),  // ✅ Tailwind setup
+    react(),
+    tailwindcss(),
   ],
   optimizeDeps: {
+    include: ['react-icons'],       // ✅ prebundle react-icons
     esbuildOptions: {
-      ignoreAnnotations: true, // ✅ ignore "use client" warnings
+      ignoreAnnotations: true,
     },
   },
   build: {
-    outDir: 'dist', // ✅ ensure build output folder
+    outDir: 'dist',
+    rollupOptions: {
+      external: [],                 // ✅ ensure nothing externalized
+    },
   },
 })
