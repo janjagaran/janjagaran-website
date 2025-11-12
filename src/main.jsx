@@ -6,6 +6,10 @@ import "./index.css";
 import App from "./App.jsx";
 import CategoryPage from "./pages/CategoryPage.jsx"; // ✅ import CategoryPage
 import ArticleDetails from "./pages/ArticleDetails.jsx";
+import AboutUs from "./pages/AboutUs.jsx";
+import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
+import TermsCondition from "./pages/TermsCondition.jsx";
+import Contact from "./pages/Contact.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -14,6 +18,10 @@ createRoot(document.getElementById("root")).render(
         <Route path="/" element={<App />} />
         <Route path="/category/:slug" element={<CategoryPage />} /> {/* ✅ dynamic route */}
         <Route path="/:slug" element={<ArticleDetails />} /> {/* ✅ new route */}
+        <Route path="/about-us" element={<AboutUs/>} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy/>} />
+        <Route path="/terms-and-condition" element={<TermsCondition/>} />
+        <Route path="/contact-us" element={<Contact/>} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

@@ -25,10 +25,10 @@ const Footer = () => {
             Subscribe to Janjagaran
           </h3>
           <p className="text-sm text-gray-400 mb-5 leading-relaxed">
-            Stay updated on the latest happenings in Odisha's Whether it's
-            business, politics, fashion, tech or finance, we deliver it in a
-            flash—straight to your inbox.
+          Jan Jagaran News is dedicated to delivering reliable and trustworthy news to our readers in Odisha and beyond. We strive to be a leading source of information, keeping you informed about local, national, and international news with integrity and accuracy.
           </p>
+
+          <div className="text-sm text-gray-400 mb-1 leading-relaxed">GST: 21AVIPS5975M1ZV</div>
 
           <form className="flex bg-transparent border border-gray-700 rounded-md overflow-hidden w-full max-w-md mb-3">
             <input
