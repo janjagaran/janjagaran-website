@@ -17,7 +17,7 @@ export default defineConfig({
     tailwindcss(),
   ],
   optimizeDeps: {
-    include: ['react-icons'],       // ✅ prebundle react-icons
+    include: ['react-icons/fa', 'react-icons/fa6'],  // ✅ explicitly include react-icons
     esbuildOptions: {
       ignoreAnnotations: true,
     },
@@ -25,7 +25,10 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     rollupOptions: {
-      external: [],                 // ✅ ensure nothing externalized
+      external: [], // ✅ ensure nothing is treated as external
+    },
+    commonjsOptions: {
+      include: [/react-icons/, /node_modules/], // ✅ ensures CommonJS icons load fine
     },
   },
 })
