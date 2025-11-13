@@ -30,7 +30,7 @@ const Footer = () => {
 
           <div className="text-sm text-gray-400 mb-1 leading-relaxed">GST: 21AVIPS5975M1ZV</div>
 
-          <form className="flex bg-transparent border border-gray-700 rounded-md overflow-hidden w-full max-w-md mb-3">
+          {/* <form className="flex bg-transparent border border-gray-700 rounded-md overflow-hidden w-full max-w-md mb-3">
             <input
               type="email"
               placeholder="youremail@gmail.com"
@@ -39,6 +39,21 @@ const Footer = () => {
             <button
               type="submit"
               className="bg-red-600 hover:bg-red-700 text-white px-4 text-sm font-medium"
+            >
+              Subscribe
+            </button>
+          </form> */}
+          <form className="flex bg-transparent border border-gray-700 rounded-md w-full max-w-md mb-3 overflow-visible">
+            <input
+              type="email"
+              placeholder="youremail@gmail.com"
+              className="flex-grow px-3 py-2 text-sm bg-transparent outline-none text-gray-100 placeholder-gray-500 min-w-0"
+              style={{ minWidth: 0 }}
+            />
+            <button
+              type="submit"
+              className="bg-red-600 hover:bg-red-700 text-white px-5 py-2 text-sm font-medium whitespace-nowrap h-full"
+              style={{ borderTopLeftRadius: 2, borderBottomLeftRadius: 2 }}
             >
               Subscribe
             </button>
@@ -138,7 +153,7 @@ const Footer = () => {
           <p>Copyright © 2025 • All Rights Reserved</p>
           <div className="flex items-center gap-4 mt-3 md:mt-0">
             <p>
-              Made with <span className="text-red-500">♥</span> Trackepay
+              Made with <span className="text-red-500">♥</span> <a href="https://www.trackepay.in/">Trackepay</a>
             </p>
             {/* <button className="bg-[#f5f5f5] text-black text-xs px-3 py-1 rounded-full font-medium hover:bg-gray-200 transition">
               Made in Trackepay

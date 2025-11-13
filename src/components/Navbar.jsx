@@ -1246,7 +1246,7 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-[100] w-full bg-white/90 backdrop-blur-md shadow-md">
-             <div className="hidden sm:block w-full bg-gradient-to-r from-[#C10C2A] via-[#D91E36] to-[#E73C4E] text-white shadow-md">
+             <div className="hidden sm:block w-full bg-[#0b1120] text-white shadow-md">
               <div className="max-w-7xl mx-auto flex justify-between items-center font-inter">
               <div>
                 Udyam Registration Number: UDYAM-OD-02-0024515
