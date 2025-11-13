@@ -358,7 +358,7 @@ const LatestNews = ({ limit = 6 }) => {
                 {a.category ? `${a.category} • ` : ""}
                 {a.publishedAt ? new Date(a.publishedAt).toLocaleDateString() : ""}
               </p>
-              <h3 className="text-sm sm:text-base font-semibold text-gray-800 line-clamp-2 mb-1">
+              <h3 className="text-sm sm:text-base font-bold text-black-800 line-clamp-2 mb-1">
                 {a.title}
               </h3>
               <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{a.description}</p>

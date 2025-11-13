@@ -195,6 +195,7 @@ import React, { useEffect, useState } from "react";
 import { getSahityaArticles } from "../../api/article";
 import { Link } from "react-router-dom";
 import { Loader2 } from "lucide-react";
+import { block } from "million/react";   // ← ADD THIS
 
 const FeaturedMain = () => {
   const [article, setArticle] = useState(null);

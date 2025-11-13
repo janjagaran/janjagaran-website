@@ -199,7 +199,7 @@ const TopStories = () => {
                 <p className="text-[11px] sm:text-xs text-gray-400 mb-1">
                   {new Date(item.publishedAt).toLocaleDateString()}
                 </p>
-                <h4 className="text-sm sm:text-base font-medium text-gray-800 line-clamp-2 group-hover:text-red-500 transition">
+                <h4 className="text-sm sm:text-base font-bold text-black-800 line-clamp-2 group-hover:text-red-500 transition">
                   {item.title}
                 </h4>
               </div>

@@ -100,15 +100,15 @@ const MultiCategorySection = () => {
                   alt={article.title}
                   className="w-full h-[180px] object-cover rounded-xl transition-transform duration-500 group-hover:scale-[1.03]"
                 />
-                <p className="text-xs text-gray-400 mt-3 mb-1">
+                <p className="text-xs text-gray-900 mt-3 mb-1">
                   {section.label} ·{" "}
                   {new Date(article.publishedAt).toLocaleDateString()}
-                </p>
-                <h3 className="text-base font-semibold text-gray-800 leading-snug hover:text-red-500 transition line-clamp-2">
+                  </p>
+                <h3 className="text-base font-bold text-black-800 leading-snug hover:text-red-500 transition line-clamp-2">
                   {article.title}
                 </h3>
                 {article.description && (
-                  <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                  <p className="text-base text-black-700 mt-1 line-clamp-2">
                     {article.description}
                   </p>
                 )}

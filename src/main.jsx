@@ -10,6 +10,7 @@ import AboutUs from "./pages/AboutUs.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import TermsCondition from "./pages/TermsCondition.jsx";
 import Contact from "./pages/Contact.jsx";
+import Author from "./pages/Author.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -22,6 +23,8 @@ createRoot(document.getElementById("root")).render(
         <Route path="/privacy-policy" element={<PrivacyPolicy/>} />
         <Route path="/terms-and-condition" element={<TermsCondition/>} />
         <Route path="/contact-us" element={<Contact/>} />
+        <Route path="/author" element={<Author/>} />
+
       </Routes>
     </BrowserRouter>
   </StrictMode>

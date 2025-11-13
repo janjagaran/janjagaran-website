@@ -152,17 +152,41 @@ const SidebarFinance = () => {
                   className="w-full h-full object-cover hover:scale-[1.05] transition-transform"
                 />
               </Link>
-              <div className="flex-1">
+              {/* <div className="flex-1">
                 <Link to={`/${item.slug}`} className="block font-bold text-black-700 hover:text-red-500 line-clamp-2">
                   {item.title}
                 </Link>
-                <p className="text-[11px] sm:text-xs text-gray-600 mt-1 line-clamp-2">
+                <p className="text-[12px] sm:text-base text-black-700 mt-1 line-clamp-2 text-semibold">
                   {item.description}
                 </p>
                 <p className="text-[10px] text-gray-400 mt-1">
                   {new Date(item.publishedAt).toLocaleDateString()}
                 </p>
-              </div>
+              </div> */}
+              <div className="flex-1 min-w-0">
+  <Link
+    to={`/${item.slug}`}
+    className="block font-semibold text-gray-900 hover:text-red-600 text-[13px] sm:text-[14px] leading-snug line-clamp-2 transition-colors font-inter"
+  >
+    {item.title}
+  </Link>
+
+  {/* Description (short and neat) */}
+  {item.description && (
+    <p
+      className="text-[11px] sm:text-[14px] text-black-800 leading-tight mt-1 line-clamp-1 sm:line-clamp-2 font-inter"
+      title={item.description} // Tooltip for full text
+    >
+      {item.description}
+    </p>
+  )}
+
+  {/* Date */}
+  <p className="text-[10px] text-gray-400 mt-1 whitespace-nowrap">
+    {new Date(item.publishedAt).toLocaleDateString()}
+  </p>
+</div>
+
             </li>
           ))}
         </ul>

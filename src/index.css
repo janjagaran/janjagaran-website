@@ -11,6 +11,16 @@ html, body {
   scrollbar-width: none;
 }
 
+@theme {
+  --font-inter: "Inter", sans-serif;
+  --font-noto: "Noto Sans", sans-serif;
+  --font-noto-serif: "Noto Serif", serif;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
 /* :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;

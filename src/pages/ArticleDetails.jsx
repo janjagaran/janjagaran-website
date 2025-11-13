@@ -105,7 +105,7 @@ const ArticleDetails = () => {
         />
 
         <h1 className="text-2xl font-bold mb-3">{article.title}</h1>
-        <p className="text-gray-700 text-base leading-relaxed text-justify">
+        <p className="text-black-400 text-base leading-relaxed text-justify font-semibold">
           {article.description || "No description provided for this article yet."}
         </p>
 

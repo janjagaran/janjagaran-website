@@ -56,13 +56,27 @@ const Footer = () => {
             Company
           </h4>
           <ul className="space-y-2 text-sm text-gray-400">
-            {["About", "Careers", "Authors", "Advertise", "Contact"].map(
-              (item, i) => (
-                <li key={i} className="hover:text-red-500 cursor-pointer">
-                  {item}
-                </li>
-              )
-            )}
+            <li className="hover:text-red-500 cursor-pointer">
+              <a href="/about-us">About</a>
+            </li>
+            <li className="hover:text-red-500 cursor-pointer">
+              <a href="#">Careers</a>
+            </li>
+            <li className="hover:text-red-500 cursor-pointer">
+              <a href="/author">Authors</a>
+            </li>
+            <li className="hover:text-red-500 cursor-pointer">
+              <a href="#">Advertise</a>
+            </li>
+            <li className="hover:text-red-500 cursor-pointer">
+              <a href="/contact-us">Contact</a>
+            </li>
+            <li className="hover:text-red-500 cursor-pointer">
+              <a href="/privacy-policy">Privacy Policy</a>
+            </li>
+            <li className="hover:text-red-500 cursor-pointer">
+              <a href="/terms-and-condition">Terms & Conditions</a>
+            </li>
           </ul>
         </div>
 
@@ -74,19 +88,19 @@ const Footer = () => {
           </h4>
           <ul className="grid grid-cols-2 gap-y-2 text-sm text-gray-400">
             {[
-              "Business",
-              "Finance",
-              "Health",
-              "Politics",
-              "Fashion",
-              "Real Estate",
-              "Travel",
-              "Entertainment",
-              "Sports",
-              "Tech",
+              { name: "Crime",       slug: "aparadh" },
+              { name: "Regional",    slug: "ଆଞ୍ଚଳିକ" },
+              { name: "Sports",      slug: "ଖେଳ" },
+              { name: "Life Style",  slug: "ଜୀବନଚର୍ଯ୍ୟା" },
+              { name: "National", slug: "ଦେଶ-ବିଦେଶ" },
+              { name: "Tourism",     slug: "ପର୍ଯ୍ୟଟନ" },
+              { name: "Special",     slug: "ବିଶେଷ" },
+              { name: "Capital",     slug: "ରାଜଧାନୀ" },
+              { name: "Politics",    slug: "ରାଜନୀତି" },
+              { name: "State",       slug: "ରାଜ୍ୟ" },
             ].map((item, i) => (
               <li key={i} className="hover:text-red-500 cursor-pointer">
-                {item}
+                <a href={`/category/${item.slug}`}>{item.name}</a>
               </li>
             ))}
           </ul>

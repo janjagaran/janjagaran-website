@@ -1247,7 +1247,15 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-[100] w-full bg-white/90 backdrop-blur-md shadow-md">
              <div className="hidden sm:block w-full bg-gradient-to-r from-[#C10C2A] via-[#D91E36] to-[#E73C4E] text-white shadow-md">
-  <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-center items-center gap-4 py-2 px-4 text-sm sm:text-base font-semibold tracking-wide">
+              <div className="max-w-7xl mx-auto flex justify-between items-center font-inter">
+              <div>
+                Udyam Registration Number: UDYAM-OD-02-0024515
+              </div>
+              <div>
+              GST: 21AVIPS5975M1ZV
+              </div>
+              </div>
+  {/* <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-center items-center gap-4 py-2 px-4 text-sm sm:text-base font-semibold tracking-wide">
     <Link
       to="/about-us"
       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
@@ -1275,7 +1283,14 @@ const Navbar = () => {
     >
       Contact Us
     </Link>
-  </div>
+    <span className="hidden sm:inline-block opacity-60">|</span>
+    <Link
+      to="/author"
+      className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+    >
+      Authors
+    </Link>
+  </div> */}
 </div>
       {/* 🔹 Top Header */}
       <div className="bg-gradient-to-r from-red-600 to-rose-500 text-white border-b border-white/20">
@@ -1291,7 +1306,7 @@ const Navbar = () => {
           </Link>
 
           <div className="flex items-center gap-3">
-            <span className="hidden md:block text-yellow-200 font-semibold">
+            <span className="hidden md:block text-yellow-200 font-semibold font-inter">
               Odisha, IN <span className="text-white">27.2°C</span>
             </span>
             <button
@@ -1307,7 +1322,7 @@ const Navbar = () => {
       {/* 🔴 Category Bar (Desktop) */}
       <div className="hidden md:block bg-[#FCF9EA] border-y border-gray-200">
         <nav className="max-w-7xl mx-auto flex items-center justify-between py-3 px-6 lg:px-10">
-          <ul className="flex items-center gap-6 text-[15px] font-medium text-gray-900 whitespace-nowrap">
+          <ul className="flex items-center gap-6 text-[15px] font-bold text-black-900 whitespace-nowrap">
             {/* 🔸 Other Main Categories */}
             <Link to="/">
               <Warehouse size={20} />
@@ -1343,13 +1358,13 @@ const Navbar = () => {
               </button>
 
               <div
-                className={`absolute left-1/2 -translate-x-1/2 top-full bg-white text-gray-900 border shadow-lg w-[600px] mt-2 rounded-2xl transition-all duration-300 ${
+                className={`absolute left-1/2 -translate-x-1/2 top-full bg-white text-black-900 border shadow-lg w-[600px] mt-2 rounded-2xl transition-all duration-300 ${
                   showDistricts
                     ? "opacity-100 visible translate-y-0"
                     : "opacity-0 invisible -translate-y-2"
                 }`}
               >
-                <div className="grid grid-cols-3 gap-x-6 gap-y-3 p-6 text-sm font-medium">
+                <div className="grid grid-cols-3 gap-x-6 gap-y-3 p-6 text-sm font-bold">
                   {districtCategories.map((dist) => (
                     <Link
                       key={dist.id}
@@ -1385,7 +1400,7 @@ const Navbar = () => {
                     : "opacity-0 invisible -translate-y-2"
                 }`}
               >
-                <div className="grid grid-cols-2 gap-4 p-4 text-sm font-medium">
+                <div className="grid grid-cols-2 gap-4 p-4 text-sm font-bold">
                   {specialCategories.map((item) => (
                     <Link
                       key={item.id}
