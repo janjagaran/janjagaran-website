@@ -372,7 +372,7 @@ const HealthSection = () => {
         </h2>
         <Link
           to="/category/aparadh"
-          className="text-red-500 text-sm sm:text-base font-medium hover:underline"
+          className="text-red-600 text-sm font-inter sm:text-base font-medium hover:underline"
         >
           view all →
         </Link>

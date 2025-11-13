@@ -46,7 +46,7 @@ const PodcastSection = () => {
         </h2>
         <Link
           to="/category/miscellaneous"
-          className="text-red-500 text-sm font-medium hover:underline"
+          className="text-red-600 font-inter text-sm font-medium hover:underline"
         >
           view all →
         </Link>

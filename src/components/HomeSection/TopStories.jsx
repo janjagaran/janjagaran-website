@@ -156,7 +156,7 @@ const TopStories = () => {
         <h2 className="flex items-center text-base sm:text-lg font-semibold text-gray-900">
           <span className="w-[2px] h-5 bg-red-600 mr-2 rounded" /> ଖେଳ (Khela)
         </h2>
-        <Link to="/category/khela" className="text-red-500 text-xs sm:text-sm font-medium hover:underline">
+        <Link to="/category/khela" className="text-red-600 text-xs sm:text-sm font-medium hover:underline font-inter">
           view all →
         </Link>
       </div>

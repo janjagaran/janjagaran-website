@@ -84,7 +84,7 @@ const MultiCategorySection = () => {
                 </h2>
                 <Link
                   to={`/category/${section.slug}`}
-                  className="text-red-500 text-sm font-medium hover:underline"
+                  className="text-red-600 font-inter text-sm font-medium hover:underline"
                 >
                   view all →
                 </Link>

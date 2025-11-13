@@ -1295,7 +1295,7 @@ const Navbar = () => {
       {/* 🔹 Top Header */}
       <div className="bg-gradient-to-r from-red-600 to-rose-500 text-white border-b border-white/20">
         <div className="max-w-7xl mx-auto flex justify-between items-center py-2 px-4 sm:px-6 lg:px-10 text-xs sm:text-sm font-medium">
-          <span className="opacity-90">{time}</span>
+          <span className="opacity-90 text-[16px]">{time}</span>
 
           <Link to="/" className="flex items-center justify-center">
             <img
@@ -1306,8 +1306,8 @@ const Navbar = () => {
           </Link>
 
           <div className="flex items-center gap-3">
-            <span className="hidden md:block text-yellow-200 font-semibold font-inter">
-              Odisha, IN <span className="text-white">27.2°C</span>
+            <span className="hidden md:block text-yellow-200 font-semibold text-[16px] font-inter">
+              Odisha, INDIA
             </span>
             <button
               onClick={() => setMenuOpen((prev) => !prev)}
@@ -1415,9 +1415,9 @@ const Navbar = () => {
             </li>
           </ul>
 
-          <button className="flex-shrink-0 ml-4 p-2 rounded-full border border-gray-400 hover:bg-gray-100 transition">
+          {/* <button className="flex-shrink-0 ml-4 p-2 rounded-full border border-gray-400 hover:bg-gray-100 transition">
             <Search size={18} />
-          </button>
+          </button> */}
         </nav>
       </div>
 

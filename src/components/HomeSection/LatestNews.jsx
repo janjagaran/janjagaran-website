@@ -334,7 +334,7 @@ const LatestNews = ({ limit = 6 }) => {
           <span className="w-1.5 h-4 sm:h-5 bg-red-600 rounded-sm" />
           Latest News
         </h2>
-        <Link to="/category/aparadh" className="text-red-600 text-xs sm:text-sm hover:underline">
+        <Link to="/category/aparadh" className="text-red-600 text-xs sm:text-sm hover:underline font-inter">
           view all →
         </Link>
       </div>

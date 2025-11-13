@@ -137,7 +137,7 @@ const SidebarFinance = () => {
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base flex items-center gap-2">
             <span className="w-[2px] h-5 bg-red-600 rounded"></span> ଜିଲ୍ଲା (Zilla)
           </h3>
-          <Link to="/category/zilla" className="text-red-500 text-xs sm:text-sm hover:underline">
+          <Link to="/category/zilla" className="text-red-500 text-xs sm:text-sm hover:underline font-inter">
             view all →
           </Link>
         </div>
