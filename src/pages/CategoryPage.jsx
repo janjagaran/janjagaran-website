@@ -131,9 +131,15 @@ const CategoryPage = () => {
                     <h2 className="text-lg md:text-xl font-semibold mb-2 hover:text-red-600">
                       {article.title}
                     </h2>
-                    <p className="text-gray-600 text-sm line-clamp-3 mb-3">
-                      {article.description || "No description available."}
-                    </p>
+                    <div
+  className="text-black-700 font-semibold text-sm line-clamp-3 mb-3"
+  dangerouslySetInnerHTML={{
+    __html:
+      article.excerpt ||
+      article.content?.substring(0, 120) ||
+      "No description available.",
+  }}
+></div>
                     <p className="text-xs text-gray-500">
                       {new Date(article.publishedAt).toLocaleDateString("en-IN")}
                     </p>
