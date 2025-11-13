@@ -4,6 +4,7 @@ import { getArticleBySlug } from "../api/article"; // ✅ your existing API func
 import { Loader2 } from "lucide-react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import NotFound from "./NotFound";
 
 const ArticleDetails = () => {
   const { slug } = useParams();
@@ -40,12 +41,8 @@ const ArticleDetails = () => {
       <div className="text-center py-20 text-red-500 text-lg">{error}</div>
     );
 
-  if (!article)
-    return (
-      <div className="text-center py-20 text-gray-500 text-lg">
-        No article found.
-      </div>
-    );
+  
+    if (!article) return <NotFound />;
 
   return (
     // <div className="w-full">

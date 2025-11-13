@@ -11,6 +11,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy.jsx";
 import TermsCondition from "./pages/TermsCondition.jsx";
 import Contact from "./pages/Contact.jsx";
 import Author from "./pages/Author.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -18,13 +19,15 @@ createRoot(document.getElementById("root")).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/category/:slug" element={<CategoryPage />} /> {/* ✅ dynamic route */}
-        <Route path="/:slug" element={<ArticleDetails />} /> {/* ✅ new route */}
+        {/* <Route path="/:slug" element={<ArticleDetails />} />  */}
+  <Route path="/:slug" element={<ArticleDetails />} />
         <Route path="/about-us" element={<AboutUs/>} />
         <Route path="/privacy-policy" element={<PrivacyPolicy/>} />
         <Route path="/terms-and-condition" element={<TermsCondition/>} />
         <Route path="/contact-us" element={<Contact/>} />
         <Route path="/author" element={<Author/>} />
-
+ {/* Catch-all */}
+ <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>
