@@ -93,7 +93,7 @@ const ArticleDetails = () => {
     // </div>
     <div className="w-full">
         <Navbar/>
-        <div className="max-w-6xl mx-auto p-6 border border-gray-200 rounded-2xl bg-white">
+        <div className="max-w-6xl mx-auto p-6 border border-gray-200 rounded-2xl bg-white mt-4 mb-6">
       <div className="relative">
         <img
           src={article.image}
