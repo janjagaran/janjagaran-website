@@ -328,7 +328,7 @@ const LatestNews = ({ limit = 6 }) => {
     return <p className="text-center py-8 text-gray-400">No latest articles found.</p>;
 
   return (
-    <section className="max-w-7xl mx-auto px-3 sm:px-6 py-6 sm:py-8">
+    <section className="max-w-7xl mx-auto px-3 sm:px-6 py-1 sm:py-8">
       <div className="flex items-center justify-between mb-4 sm:mb-6">
         <h2 className="text-base sm:text-lg font-semibold flex items-center gap-2">
           <span className="w-1.5 h-4 sm:h-5 bg-red-600 rounded-sm" />

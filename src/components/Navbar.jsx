@@ -1167,8 +1167,372 @@
 
 // wordpress
 
+// import React, { useEffect, useState } from "react";
+// import { Search, Menu, X, ChevronDown , Warehouse } from "lucide-react";
+// import { Link, useLocation } from "react-router-dom";
+// import { getCategories } from "../api/category.js";
+
+// const Navbar = () => {
+//   const [categories, setCategories] = useState([]);
+//   const [time, setTime] = useState("");
+//   const [menuOpen, setMenuOpen] = useState(false);
+//   const [showDistricts, setShowDistricts] = useState(false);
+//   const [showSpecial, setShowSpecial] = useState(false);
+//   const location = useLocation();
+
+//   // 🏙️ District & Special Category Names
+//   const districtNames = [
+//     "ଅନୁଗୁଳ", "ବଲାଙ୍ଗିର", "ବାଲେଶ୍ଵର", "ବରଗଡ଼", "ଭଦ୍ରକ", "ବୌଦ୍ଧ", "କଟକ",
+//     "ଦେବଗଡ଼", "ଢେଙ୍କାନାଳ", "ଗଜପତି", "ଗଞ୍ଜାମ", "ଜଗତସିଂହପୁର", "ଝାରସୁଗୁଡା",
+//     "କଳାହାଣ୍ଡି", "କେନ୍ଦୁଝର", "କେନ୍ଦ୍ରାପଡ଼ା", "ଖୋର୍ଦ୍ଧା", "କୋରାପୁଟ",
+//     "ମାଲକାନଗିରି", "ମୟୂରଭଞ୍ଜ", "ନବରଙ୍ଗପୁର", "ନୟାଗଡ଼", "ନୂଆପଡ଼ା",
+//     "ପୁରୀ", "ରାୟଗଡ଼ା", "ସମ୍ବଲପୁର", "ସୁବର୍ଣ୍ଣପୁର", "ସୁନ୍ଦରଗଡ଼",
+//     "ଟିଟିଲାଗଡ଼", "ଯାଜପୁର"
+//   ];
+
+//   const specialNames = ["ସାହିତ୍ୟ", "ମନୋରଞ୍ଜନ", "ସ୍ବାସ୍ଥ୍ୟ", "ଶିକ୍ଷା"];
+
+//   // ✅ Normalize Odia text for consistent matching
+//   const normalize = (text = "") =>
+//     text.normalize("NFC").replace(/\s+/g, "").trim();
+
+//   // ✅ Fetch all categories from WordPress
+//   useEffect(() => {
+//     const fetchCategories = async () => {
+//       try {
+//         const data = await getCategories();
+//         setCategories(data || []);
+//       } catch (err) {
+//         console.error("Error fetching categories:", err);
+//       }
+//     };
+//     fetchCategories();
+//   }, []);
+
+//   // ✅ Categorize categories
+//   const districtCategories = categories.filter((c) =>
+//     districtNames.some((name) => normalize(c.name) === normalize(name))
+//   );
+
+//   const specialCategories = categories.filter((c) =>
+//     specialNames.some((name) => normalize(c.name) === normalize(name))
+//   );
+
+//   const otherCategories = categories.filter(
+//     (c) =>
+//       !districtNames.some((name) => normalize(c.name) === normalize(name)) &&
+//       !specialNames.some((name) => normalize(c.name) === normalize(name)) &&
+//       c.name !== "ଜିଲ୍ଲା" &&
+//       normalize(c.name.toLowerCase()) !== "miscellaneous"
+//   );
+
+//   // 🕒 Live Time
+//   useEffect(() => {
+//     const updateTime = () => {
+//       const now = new Date();
+//       const formatted = now.toLocaleString("en-US", {
+//         month: "short",
+//         day: "2-digit",
+//         hour: "2-digit",
+//         minute: "2-digit",
+//         hour12: false,
+//       });
+//       setTime(formatted.replace(",", " -"));
+//     };
+//     updateTime();
+//     const interval = setInterval(updateTime, 1000);
+//     return () => clearInterval(interval);
+//   }, []);
+
+//   return (
+//     <header className="sticky top-0 z-[100] w-full bg-white/90 backdrop-blur-md shadow-md">
+//              <div className="hidden sm:block w-full bg-[#0b1120] text-white shadow-md">
+//               <div className="max-w-7xl mx-auto flex justify-between items-center font-inter">
+//               <div>
+//                 Udyam Registration Number: UDYAM-OD-02-0024515
+//               </div>
+//               <div>
+//               GST: 21AVIPS5975M1ZV
+//               </div>
+//               </div>
+//   {/* <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-center items-center gap-4 py-2 px-4 text-sm sm:text-base font-semibold tracking-wide">
+//     <Link
+//       to="/about-us"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       About Us
+//     </Link>
+//     <span className="hidden sm:inline-block opacity-60">|</span>
+//     <Link
+//       to="/privacy-policy"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       Privacy Policy
+//     </Link>
+//     <span className="hidden sm:inline-block opacity-60">|</span>
+//     <Link
+//       to="/terms-and-condition"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       Terms & Conditions
+//     </Link>
+//     <span className="hidden sm:inline-block opacity-60">|</span>
+//     <Link
+//       to="/contact-us"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       Contact Us
+//     </Link>
+//     <span className="hidden sm:inline-block opacity-60">|</span>
+//     <Link
+//       to="/author"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       Authors
+//     </Link>
+//   </div> */}
+// </div>
+//       {/* 🔹 Top Header */}
+//       <div className="bg-gradient-to-r from-red-600 to-rose-500 text-white border-b border-white/20">
+//         <div className="max-w-7xl mx-auto flex justify-between items-center py-2 px-4 sm:px-6 lg:px-10 text-xs sm:text-sm font-medium">
+//         <span className="opacity-90 text-[12px] sm:text-[14px] md:text-[16px] font-medium">
+//   {time}
+// </span>
+
+// <img
+//   src="/janjagaran.png"
+//   alt="Janjagaran"
+//   className="h-8 sm:h-10 md:h-12 lg:h-16 w-auto rounded-md transition-all duration-300"
+// />
+
+//           <div className="flex items-center gap-3">
+//             <span className="hidden md:block text-yellow-200 font-semibold text-[16px] font-inter">
+//               Odisha, INDIA
+//             </span>
+//             <button
+//               onClick={() => setMenuOpen((prev) => !prev)}
+//               className="block lg:hidden text-white hover:text-yellow-300 transition"
+//             >
+//               {menuOpen ? <X size={22} /> : <Menu size={22} />}
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* 🔴 Category Bar (Desktop) */}
+//       <div className="hidden md:block bg-[#FCF9EA] border-y border-gray-200">
+//         <nav className="max-w-7xl mx-auto flex items-center justify-between py-3 px-6 lg:px-10">
+//           <ul className="flex items-center gap-6 text-[15px] font-bold text-black-900 whitespace-nowrap">
+//             {/* 🔸 Other Main Categories */}
+//             <Link to="/">
+//               <Warehouse size={20} />
+//             </Link>
+//             {otherCategories.map((cat) => (
+//               <li key={cat.id}>
+//                 <Link
+//                   to={`/category/${cat.slug || cat.name}`}
+//                   className={`hover:text-red-600 transition-colors ${
+//                     location.pathname === `/category/${cat.slug}`
+//                       ? "text-red-600 font-semibold"
+//                       : ""
+//                   }`}
+//                 >
+//                   {cat.name}
+//                 </Link>
+//               </li>
+//             ))}
+
+//             {/* 🏙️ District Dropdown */}
+//             <li
+//               className="relative"
+//               onMouseEnter={() => setShowDistricts(true)}
+//               onMouseLeave={() => setShowDistricts(false)}
+//             >
+//               <button className="flex items-center gap-1 hover:text-red-600 transition">
+//                 ଜିଲ୍ଲା
+//                 <ChevronDown
+//                   className={`h-4 w-4 transition-transform duration-300 ${
+//                     showDistricts ? "rotate-180" : "rotate-0"
+//                   }`}
+//                 />
+//               </button>
+
+//               <div
+//                 className={`absolute left-1/2 -translate-x-1/2 top-full bg-white text-black-900 border shadow-lg w-[600px] mt-2 rounded-2xl transition-all duration-300 ${
+//                   showDistricts
+//                     ? "opacity-100 visible translate-y-0"
+//                     : "opacity-0 invisible -translate-y-2"
+//                 }`}
+//               >
+//                 <div className="grid grid-cols-3 gap-x-6 gap-y-3 p-6 text-sm font-bold">
+//                   {districtCategories.map((dist) => (
+//                     <Link
+//                       key={dist.id}
+//                       to={`/category/${dist.slug}`}
+//                       className="hover:text-red-600 whitespace-nowrap truncate transition"
+//                     >
+//                       {dist.name}
+//                     </Link>
+//                   ))}
+//                 </div>
+//               </div>
+//             </li>
+
+//             {/* 🌟 Special Dropdown */}
+//             <li
+//               className="relative"
+//               onMouseEnter={() => setShowSpecial(true)}
+//               onMouseLeave={() => setShowSpecial(false)}
+//             >
+//               <button className="flex items-center gap-1 hover:text-red-600 transition">
+//                 ବିଶେଷ
+//                 <ChevronDown
+//                   className={`h-4 w-4 transition-transform duration-300 ${
+//                     showSpecial ? "rotate-180" : "rotate-0"
+//                   }`}
+//                 />
+//               </button>
+
+//               <div
+//                 className={`absolute left-1/2 -translate-x-1/2 top-full bg-white text-gray-900 border shadow-lg w-[280px] mt-2 rounded-xl transition-all duration-300 ${
+//                   showSpecial
+//                     ? "opacity-100 visible translate-y-0"
+//                     : "opacity-0 invisible -translate-y-2"
+//                 }`}
+//               >
+//                 <div className="grid grid-cols-2 gap-4 p-4 text-sm font-bold">
+//                   {specialCategories.map((item) => (
+//                     <Link
+//                       key={item.id}
+//                       to={`/category/${item.slug}`}
+//                       className="hover:text-red-600 whitespace-nowrap"
+//                     >
+//                       {item.name}
+//                     </Link>
+//                   ))}
+//                 </div>
+//               </div>
+//             </li>
+//           </ul>
+
+//           {/* <button className="flex-shrink-0 ml-4 p-2 rounded-full border border-gray-400 hover:bg-gray-100 transition">
+//             <Search size={18} />
+//           </button> */}
+//         </nav>
+//       </div>
+
+//       {/* 📱 Mobile Menu */}
+//       <div
+//         className={`lg:hidden bg-white overflow-hidden border-t transition-all duration-500 ${
+//           menuOpen ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0"
+//         }`}
+//       >
+//         <Link to="/" className="block hover:text-red-600 transition px-4 py-3 mb-2 rounded-lg shadow-sm border border-gray-200 bg-gradient-to-r from-white via-gray-50 to-gray-100 hover:from-[#fff3f3] hover:to-[#ffeaea] hover:text-red-600 transition-all duration-200">
+//           <Warehouse size={20} />
+//         </Link>
+//         <nav className="px-6 py-4 space-y-4 text-gray-800 text-sm font-medium">
+//           {otherCategories.map((cat) => (
+//             <Link
+//               key={cat.id}
+//               to={`/category/${cat.slug}`}
+//               onClick={() => setMenuOpen(false)}
+//               className="block hover:text-red-600 transition"
+//             >
+//               {cat.name}
+//             </Link>
+//           ))}
+
+//           {/* 🏙️ Districts on Mobile */}
+//           <div>
+//             <button
+//               className="flex items-center justify-between w-full hover:text-red-600"
+//               onClick={() => setShowDistricts((s) => !s)}
+//             >
+//               ଜିଲ୍ଲା
+//               <ChevronDown
+//                 className={`h-4 w-4 transition-transform ${
+//                   showDistricts ? "rotate-180" : "rotate-0"
+//                 }`}
+//               />
+//             </button>
+
+//             <div
+//               className={`transition-all duration-300 ${
+//                 showDistricts ? "max-h-[400px] mt-3" : "max-h-0"
+//               } overflow-hidden`}
+//             >
+//               <div className="grid grid-cols-2 gap-3">
+//                 {districtCategories.map((dist) => (
+//                   <Link
+//                     key={dist.id}
+//                     to={`/category/${dist.slug}`}
+//                     onClick={() => {
+//                       setMenuOpen(false);
+//                       setShowDistricts(false);
+//                     }}
+//                     className="block hover:text-red-600"
+//                   >
+//                     {dist.name}
+//                   </Link>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* 🌟 Specials on Mobile */}
+//           <div>
+//             <button
+//               className="flex items-center justify-between w-full hover:text-red-600"
+//               onClick={() => setShowSpecial((s) => !s)}
+//             >
+//               ବିଶେଷ
+//               <ChevronDown
+//                 className={`h-4 w-4 transition-transform ${
+//                   showSpecial ? "rotate-180" : "rotate-0"
+//                 }`}
+//               />
+//             </button>
+
+//             <div
+//               className={`transition-all duration-300 ${
+//                 showSpecial ? "max-h-[300px] mt-3" : "max-h-0"
+//               } overflow-hidden`}
+//             >
+//               <div className="grid grid-cols-2 gap-3">
+//                 {specialCategories.map((item) => (
+//                   <Link
+//                     key={item.id}
+//                     to={`/category/${item.slug}`}
+//                     onClick={() => {
+//                       setMenuOpen(false);
+//                       setShowSpecial(false);
+//                     }}
+//                     className="block hover:text-red-600"
+//                   >
+//                     {item.name}
+//                   </Link>
+//                 ))}
+//               </div>
+//             </div>
+//           </div>
+
+//           <div className="border-t pt-3 flex justify-between items-center text-gray-600">
+//             <span className="text-xs">{time}</span>
+//             <button className="flex items-center gap-2 hover:text-red-600 transition">
+//               <Search size={16} /> Search
+//             </button>
+//           </div>
+//         </nav>
+//       </div>
+//     </header>
+//   );
+// };
+
+// export default Navbar;
+
+//new code 14-11-2025
 import React, { useEffect, useState } from "react";
-import { Search, Menu, X, ChevronDown , Warehouse } from "lucide-react";
+import { Search, Menu, X, ChevronDown, Warehouse } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { getCategories } from "../api/category.js";
 
@@ -1180,23 +1544,20 @@ const Navbar = () => {
   const [showSpecial, setShowSpecial] = useState(false);
   const location = useLocation();
 
-  // 🏙️ District & Special Category Names
   const districtNames = [
-    "ଅନୁଗୁଳ", "ବଲାଙ୍ଗିର", "ବାଲେଶ୍ଵର", "ବରଗଡ଼", "ଭଦ୍ରକ", "ବୌଦ୍ଧ", "କଟକ",
-    "ଦେବଗଡ଼", "ଢେଙ୍କାନାଳ", "ଗଜପତି", "ଗଞ୍ଜାମ", "ଜଗତସିଂହପୁର", "ଝାରସୁଗୁଡା",
-    "କଳାହାଣ୍ଡି", "କେନ୍ଦୁଝର", "କେନ୍ଦ୍ରାପଡ଼ା", "ଖୋର୍ଦ୍ଧା", "କୋରାପୁଟ",
-    "ମାଲକାନଗିରି", "ମୟୂରଭଞ୍ଜ", "ନବରଙ୍ଗପୁର", "ନୟାଗଡ଼", "ନୂଆପଡ଼ା",
-    "ପୁରୀ", "ରାୟଗଡ଼ା", "ସମ୍ବଲପୁର", "ସୁବର୍ଣ୍ଣପୁର", "ସୁନ୍ଦରଗଡ଼",
-    "ଟିଟିଲାଗଡ଼", "ଯାଜପୁର"
+    "ଅନୁଗୁଳ","ବଲାଙ୍ଗିର","ବାଲେଶ୍ଵର","ବରଗଡ଼","ଭଦ୍ରକ","ବୌଦ୍ଧ","କଟକ",
+    "ଦେବଗଡ଼","ଢେଙ୍କାନାଳ","ଗଜପତି","ଗଞ୍ଜାମ","ଜଗତସିଂହପୁର","ଝାରସୁଗୁଡା",
+    "କଳାହାଣ୍ଡି","କେନ୍ଦୁଝର","କେନ୍ଦ୍ରାପଡ଼ା","ଖୋର୍ଦ୍ଧା","କୋରାପୁଟ",
+    "ମାଲକାନଗିରି","ମୟୂରଭଞ୍ଜ","ନବରଙ୍ଗପୁର","ନୟାଗଡ଼","ନୂଆପଡ଼ା",
+    "ପୁରୀ","ରାୟଗଡ଼ା","ସମ୍ବଲପୁର","ସୁବର୍ଣ୍ଣପୁର","ସୁନ୍ଦରଗଡ଼",
+    "ଟିଟିଲାଗଡ଼","ଯାଜପୁର"
   ];
 
   const specialNames = ["ସାହିତ୍ୟ", "ମନୋରଞ୍ଜନ", "ସ୍ବାସ୍ଥ୍ୟ", "ଶିକ୍ଷା"];
 
-  // ✅ Normalize Odia text for consistent matching
   const normalize = (text = "") =>
     text.normalize("NFC").replace(/\s+/g, "").trim();
 
-  // ✅ Fetch all categories from WordPress
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -1209,7 +1570,6 @@ const Navbar = () => {
     fetchCategories();
   }, []);
 
-  // ✅ Categorize categories
   const districtCategories = categories.filter((c) =>
     districtNames.some((name) => normalize(c.name) === normalize(name))
   );
@@ -1226,7 +1586,7 @@ const Navbar = () => {
       normalize(c.name.toLowerCase()) !== "miscellaneous"
   );
 
-  // 🕒 Live Time
+  // ⏱ LIVE TIME
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -1246,67 +1606,78 @@ const Navbar = () => {
 
   return (
     <header className="sticky top-0 z-[100] w-full bg-white/90 backdrop-blur-md shadow-md">
-             <div className="hidden sm:block w-full bg-[#0b1120] text-white shadow-md">
-              <div className="max-w-7xl mx-auto flex justify-between items-center font-inter">
-              <div>
-                Udyam Registration Number: UDYAM-OD-02-0024515
-              </div>
-              <div>
-              GST: 21AVIPS5975M1ZV
-              </div>
-              </div>
-  {/* <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-center items-center gap-4 py-2 px-4 text-sm sm:text-base font-semibold tracking-wide">
-    <Link
-      to="/about-us"
-      className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
-    >
-      About Us
-    </Link>
-    <span className="hidden sm:inline-block opacity-60">|</span>
-    <Link
-      to="/privacy-policy"
-      className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
-    >
-      Privacy Policy
-    </Link>
-    <span className="hidden sm:inline-block opacity-60">|</span>
-    <Link
-      to="/terms-and-condition"
-      className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
-    >
-      Terms & Conditions
-    </Link>
-    <span className="hidden sm:inline-block opacity-60">|</span>
-    <Link
-      to="/contact-us"
-      className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
-    >
-      Contact Us
-    </Link>
-    <span className="hidden sm:inline-block opacity-60">|</span>
-    <Link
-      to="/author"
-      className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
-    >
-      Authors
-    </Link>
-  </div> */}
-</div>
-      {/* 🔹 Top Header */}
+                   <div className="hidden sm:block w-full bg-[#0b1120] text-white shadow-md">
+             <div className="max-w-7xl mx-auto flex justify-between items-center font-inter">
+               <div>
+                 Udyam Registration Number: UDYAM-OD-02-0024515
+               </div>
+               <div>
+               GST: 21AVIPS5975M1ZV
+               </div>
+               </div>
+   {/* <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-center items-center gap-4 py-2 px-4 text-sm sm:text-base font-semibold tracking-wide">
+//     <Link
+//       to="/about-us"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       About Us
+//     </Link>
+//     <span className="hidden sm:inline-block opacity-60">|</span>
+//     <Link
+//       to="/privacy-policy"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       Privacy Policy
+//     </Link>
+//     <span className="hidden sm:inline-block opacity-60">|</span>
+//     <Link
+//       to="/terms-and-condition"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       Terms & Conditions
+//     </Link>
+//     <span className="hidden sm:inline-block opacity-60">|</span>
+//     <Link
+//       to="/contact-us"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       Contact Us
+//     </Link>
+//     <span className="hidden sm:inline-block opacity-60">|</span>
+//     <Link
+//       to="/author"
+//       className="hover:text-yellow-300 transition duration-200 border-b-2 border-transparent hover:border-yellow-300"
+//     >
+//       Authors
+//     </Link>
+//   </div> */}
+ </div>
+      
+      {/* TOP HEADER WITH PERFECT CENTER LOGO */}
       <div className="bg-gradient-to-r from-red-600 to-rose-500 text-white border-b border-white/20">
-        <div className="max-w-7xl mx-auto flex justify-between items-center py-2 px-4 sm:px-6 lg:px-10 text-xs sm:text-sm font-medium">
-          <span className="opacity-90 text-[16px]">{time}</span>
+        <div className="max-w-7xl mx-auto grid grid-cols-3 items-center py-2 px-4 sm:px-6 lg:px-10">
+          
+          {/* LEFT – TIME */}
+          <div className="flex justify-start">
+            <span className="opacity-90 text-[12px] sm:text-[14px] md:text-[16px] font-medium">
+              {time}
+            </span>
+          </div>
 
-          <Link to="/" className="flex items-center justify-center">
-            <img
-              src="/janjagaran.png"
-              alt="Janjagaran"
-              className="h-12 sm:h-16 w-auto rounded-md"
-            />
-          </Link>
+          {/* CENTER – LOGO (NOW PERFECTLY CENTERED ON MOBILE) */}
+          <div className="flex justify-center">
+            <Link to="/">
+              <img
+                src="/janjagaran.png"
+                alt="Janjagaran"
+                className="h-8 sm:h-10 md:h-12 lg:h-16 w-auto transition-all duration-300"
+              />
+            </Link>
+          </div>
 
-          <div className="flex items-center gap-3">
-            <span className="hidden md:block text-yellow-200 font-semibold text-[16px] font-inter">
+          {/* RIGHT – WEATHER + HAMBURGER */}
+          <div className="flex justify-end items-center gap-3">
+            <span className="hidden md:block text-yellow-200 font-semibold">
               Odisha, INDIA
             </span>
             <button
@@ -1316,22 +1687,26 @@ const Navbar = () => {
               {menuOpen ? <X size={22} /> : <Menu size={22} />}
             </button>
           </div>
+
         </div>
       </div>
 
-      {/* 🔴 Category Bar (Desktop) */}
+      {/* DESKTOP CATEGORY NAV */}
       <div className="hidden md:block bg-[#FCF9EA] border-y border-gray-200">
         <nav className="max-w-7xl mx-auto flex items-center justify-between py-3 px-6 lg:px-10">
-          <ul className="flex items-center gap-6 text-[15px] font-bold text-black-900 whitespace-nowrap">
-            {/* 🔸 Other Main Categories */}
+          <ul className="flex items-center gap-6 text-[15px] font-bold text-black whitespace-nowrap">
+
+            {/* Home Button */}
             <Link to="/">
               <Warehouse size={20} />
             </Link>
+
+            {/* Main Categories */}
             {otherCategories.map((cat) => (
               <li key={cat.id}>
                 <Link
-                  to={`/category/${cat.slug || cat.name}`}
-                  className={`hover:text-red-600 transition-colors ${
+                  to={`/category/${cat.slug}`}
+                  className={`hover:text-red-600 transition ${
                     location.pathname === `/category/${cat.slug}`
                       ? "text-red-600 font-semibold"
                       : ""
@@ -1342,7 +1717,7 @@ const Navbar = () => {
               </li>
             ))}
 
-            {/* 🏙️ District Dropdown */}
+            {/* District Dropdown */}
             <li
               className="relative"
               onMouseEnter={() => setShowDistricts(true)}
@@ -1352,24 +1727,22 @@ const Navbar = () => {
                 ଜିଲ୍ଲା
                 <ChevronDown
                   className={`h-4 w-4 transition-transform duration-300 ${
-                    showDistricts ? "rotate-180" : "rotate-0"
+                    showDistricts ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
               <div
-                className={`absolute left-1/2 -translate-x-1/2 top-full bg-white text-black-900 border shadow-lg w-[600px] mt-2 rounded-2xl transition-all duration-300 ${
-                  showDistricts
-                    ? "opacity-100 visible translate-y-0"
-                    : "opacity-0 invisible -translate-y-2"
+                className={`absolute left-1/2 -translate-x-1/2 top-full bg-white text-black shadow-lg w-[600px] mt-2 rounded-2xl transition-all duration-300 ${
+                  showDistricts ? "opacity-100 visible" : "opacity-0 invisible"
                 }`}
               >
-                <div className="grid grid-cols-3 gap-x-6 gap-y-3 p-6 text-sm font-bold">
+                <div className="grid grid-cols-3 gap-4 p-6 text-sm font-bold">
                   {districtCategories.map((dist) => (
                     <Link
                       key={dist.id}
                       to={`/category/${dist.slug}`}
-                      className="hover:text-red-600 whitespace-nowrap truncate transition"
+                      className="hover:text-red-600"
                     >
                       {dist.name}
                     </Link>
@@ -1378,7 +1751,7 @@ const Navbar = () => {
               </div>
             </li>
 
-            {/* 🌟 Special Dropdown */}
+            {/* Special Dropdown */}
             <li
               className="relative"
               onMouseEnter={() => setShowSpecial(true)}
@@ -1388,16 +1761,14 @@ const Navbar = () => {
                 ବିଶେଷ
                 <ChevronDown
                   className={`h-4 w-4 transition-transform duration-300 ${
-                    showSpecial ? "rotate-180" : "rotate-0"
+                    showSpecial ? "rotate-180" : ""
                   }`}
                 />
               </button>
 
               <div
-                className={`absolute left-1/2 -translate-x-1/2 top-full bg-white text-gray-900 border shadow-lg w-[280px] mt-2 rounded-xl transition-all duration-300 ${
-                  showSpecial
-                    ? "opacity-100 visible translate-y-0"
-                    : "opacity-0 invisible -translate-y-2"
+                className={`absolute left-1/2 -translate-x-1/2 top-full bg-white text-black shadow-lg w-[250px] mt-2 rounded-xl transition-all duration-300 ${
+                  showSpecial ? "opacity-100 visible" : "opacity-0 invisible"
                 }`}
               >
                 <div className="grid grid-cols-2 gap-4 p-4 text-sm font-bold">
@@ -1405,7 +1776,7 @@ const Navbar = () => {
                     <Link
                       key={item.id}
                       to={`/category/${item.slug}`}
-                      className="hover:text-red-600 whitespace-nowrap"
+                      className="hover:text-red-600"
                     >
                       {item.name}
                     </Link>
@@ -1413,45 +1784,48 @@ const Navbar = () => {
                 </div>
               </div>
             </li>
-          </ul>
 
-          {/* <button className="flex-shrink-0 ml-4 p-2 rounded-full border border-gray-400 hover:bg-gray-100 transition">
-            <Search size={18} />
-          </button> */}
+          </ul>
         </nav>
       </div>
 
-      {/* 📱 Mobile Menu */}
+      {/* MOBILE MENU */}
       <div
         className={`lg:hidden bg-white overflow-hidden border-t transition-all duration-500 ${
           menuOpen ? "max-h-[700px] opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <Link to="/" className="block hover:text-red-600 transition px-4 py-3 mb-2 rounded-lg shadow-sm border border-gray-200 bg-gradient-to-r from-white via-gray-50 to-gray-100 hover:from-[#fff3f3] hover:to-[#ffeaea] hover:text-red-600 transition-all duration-200">
-          <Warehouse size={20} />
-        </Link>
-        <nav className="px-6 py-4 space-y-4 text-gray-800 text-sm font-medium">
+        <nav className="px-6 py-4 space-y-4 text-black-800 text-sm font-bold">
+
+          <Link
+            to="/"
+            onClick={() => setMenuOpen(false)}
+            className="block hover:text-red-600 transition py-2"
+          >
+            <Warehouse size={20} /> 
+          </Link>
+
           {otherCategories.map((cat) => (
             <Link
               key={cat.id}
               to={`/category/${cat.slug}`}
               onClick={() => setMenuOpen(false)}
-              className="block hover:text-red-600 transition"
+              className="block hover:text-red-600 transition py-1"
             >
               {cat.name}
             </Link>
           ))}
 
-          {/* 🏙️ Districts on Mobile */}
-          <div>
+          {/* District Dropdown Mobile */}
+          {/* <div>
             <button
-              className="flex items-center justify-between w-full hover:text-red-600"
-              onClick={() => setShowDistricts((s) => !s)}
+              className="flex items-center justify-between w-full"
+              onClick={() => setShowDistricts(!showDistricts)}
             >
               ଜିଲ୍ଲା
               <ChevronDown
-                className={`h-4 w-4 transition-transform ${
-                  showDistricts ? "rotate-180" : "rotate-0"
+                className={`h-4 w-4 transition ${
+                  showDistricts ? "rotate-180" : ""
                 }`}
               />
             </button>
@@ -1470,32 +1844,115 @@ const Navbar = () => {
                       setMenuOpen(false);
                       setShowDistricts(false);
                     }}
-                    className="block hover:text-red-600"
+                    className="block py-1 hover:text-red-600"
                   >
                     {dist.name}
                   </Link>
                 ))}
               </div>
             </div>
-          </div>
+          </div> */}
+          {/* Districts on Mobile */}
+<div className="pt-2">
+  <button
+    className="flex items-center justify-between w-full text-[15px] font-semibold py-2"
+    onClick={() => setShowDistricts(!showDistricts)}
+    aria-expanded={showDistricts}
+    aria-controls="districts-dropdown-list"
+  >
+    ଜିଲ୍ଲା
+    <ChevronDown
+      className={`h-4 w-4 transition-transform duration-300 ${
+        showDistricts ? "rotate-180" : ""
+      }`}
+    />
+  </button>
 
-          {/* 🌟 Specials on Mobile */}
+  {/* Dropdown with scrollable area for districts */}
+  <div
+    className={`transition-all duration-500 overflow-hidden bg-gray-50 rounded-lg ${
+      showDistricts ? "max-h-[450px] p-3" : "max-h-0 p-0"
+    }`}
+    id="districts-dropdown-list"
+    style={{
+      boxShadow: showDistricts
+        ? "0px 4px 15px 0px rgba(52, 54, 98, 0.06)"
+        : "none",
+      transition: "box-shadow 0.3s"
+    }}
+  >
+    {/* Show the scrollbar only when open */}
+    <div
+      className={`grid grid-cols-2 gap-3 custom-scrollbar`}
+      style={{
+        maxHeight: showDistricts ? "320px" : "0px",
+        overflowY: showDistricts ? "auto" : "hidden",
+        transition: "max-height 0.3s"
+      }}
+    >
+      {districtCategories.map((dist) => (
+        <Link
+          key={dist.id}
+          to={`/category/${dist.slug}`}
+          onClick={() => {
+            setMenuOpen(false);
+            setShowDistricts(false);
+          }}
+          className="block text-[14px] bg-white px-3 py-2 rounded-md shadow-[0_1px_4px_#eee] mb-2 border hover:bg-gradient-to-br hover:from-rose-50 hover:to-amber-50 hover:text-red-600 transition"
+        >
+          {dist.name}
+        </Link>
+      ))}
+    </div>
+
+    {/* Only show divider below when the dropdown is open and there are districts */}
+    {showDistricts && districtCategories.length > 0 && (
+      <div className="mt-4 border-t pt-3 flex justify-between items-center text-gray-500">
+        <span className="text-xs">
+          {districtCategories.length} districts shown
+        </span>
+      </div>
+    )}
+
+    {/* Custom scrollbar styles directly in global style tag */}
+    <style>
+      {`
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 7px;
+          background: #f9f9f9;
+          border-radius: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: #e4a8a9;
+          border-radius: 7px;
+        }
+        .custom-scrollbar {
+          scrollbar-width: thin;
+          scrollbar-color: #e4a8a9 #f4f4f4;
+        }
+      `}
+    </style>
+  </div>
+</div>
+
+
+          {/* Special mobile */}
           <div>
             <button
-              className="flex items-center justify-between w-full hover:text-red-600"
-              onClick={() => setShowSpecial((s) => !s)}
+              className="flex items-center justify-between w-full"
+              onClick={() => setShowSpecial(!showSpecial)}
             >
               ବିଶେଷ
               <ChevronDown
-                className={`h-4 w-4 transition-transform ${
-                  showSpecial ? "rotate-180" : "rotate-0"
+                className={`h-4 w-4 transition ${
+                  showSpecial ? "rotate-180" : ""
                 }`}
               />
             </button>
 
             <div
               className={`transition-all duration-300 ${
-                showSpecial ? "max-h-[300px] mt-3" : "max-h-0"
+                showSpecial ? "max-h-[400px] mt-3" : "max-h-0"
               } overflow-hidden`}
             >
               <div className="grid grid-cols-2 gap-3">
@@ -1507,7 +1964,7 @@ const Navbar = () => {
                       setMenuOpen(false);
                       setShowSpecial(false);
                     }}
-                    className="block hover:text-red-600"
+                    className="block py-1 hover:text-red-600"
                   >
                     {item.name}
                   </Link>
@@ -1515,13 +1972,51 @@ const Navbar = () => {
               </div>
             </div>
           </div>
+          {/* Special Categories on Mobile */}
+{/* <div className="pt-2">
+  <button
+    className="flex items-center justify-between w-full text-[15px] font-semibold py-2"
+    onClick={() => setShowSpecial(!showSpecial)}
+  >
+    ବିଶେଷ
+    <ChevronDown
+      className={`h-4 w-4 transition-transform duration-300 ${
+        showSpecial ? "rotate-180" : ""
+      }`}
+    />
+  </button>
 
-          <div className="border-t pt-3 flex justify-between items-center text-gray-600">
+  <div
+    className={`transition-all duration-500 overflow-hidden bg-gray-50 rounded-lg ${
+      showSpecial ? "max-h-[400px] p-3" : "max-h-0 p-0"
+    }`}
+  >
+    <div className="grid grid-cols-2 gap-3">
+      {specialCategories.map((item) => (
+        <Link
+          key={item.id}
+          to={`/category/${item.slug}`}
+          onClick={() => {
+            setMenuOpen(false);
+            setShowSpecial(false);
+          }}
+          className="block text-[14px] bg-white px-3 py-2 rounded-md shadow-sm border hover:bg-red-50 hover:text-red-600 transition"
+        >
+          {item.name}
+        </Link>
+      ))}
+    </div>
+  </div>
+</div> */}
+
+
+          <div className="border-t pt-3 flex justify-between items-center">
             <span className="text-xs">{time}</span>
-            <button className="flex items-center gap-2 hover:text-red-600 transition">
+            {/* <button className="flex items-center gap-2 hover:text-red-600">
               <Search size={16} /> Search
-            </button>
+            </button> */}
           </div>
+
         </nav>
       </div>
     </header>
@@ -1529,6 +2024,7 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
 
 
 // import React, { useEffect, useState } from "react";
