@@ -764,7 +764,7 @@ export const getAparadhArticles = async (page = 1, perPage = 20) => {
       `${API_URL}/posts?categories=36&_embed&orderby=date&order=desc&per_page=${perPage}&page=${page}`
     );
 
-    console.log("✅ Latest Aparadh articles fetched:", res.data);
+    // console.log("✅ Latest Aparadh articles fetched:", res.data);
 
     // 🧠 Transform response
     return res.data.map((post) => {
@@ -808,7 +808,7 @@ export const getKhelaArticles = async (page = 1, perPage = 20) => {
       `${API_URL}/posts?categories=500&_embed&per_page=${perPage}&page=${page}`
     );
 
-    console.log("✅ Fetched Aparadh articles:", res.data);
+    // console.log("✅ Fetched Aparadh articles:", res.data);
 
     // Transform response for easier frontend use
     return res.data.map((post) => {
@@ -883,7 +883,7 @@ export const getSahityaArticles = async (page = 1, perPage = 20) => {
       `${API_URL}/posts?categories=501&_embed&per_page=${perPage}&page=${page}`
     );
 
-    console.log("✅ Fetched Sahitya articles:", res.data);
+    // console.log("✅ Fetched Sahitya articles:", res.data);
 
     return res.data.map((post) => {
       // 🔹 Extract featured image safely
@@ -924,7 +924,7 @@ export const getRegionArticles = async (page = 1, perPage = 20) => {
       `${API_URL}/posts?categories=32&_embed&per_page=${perPage}&page=${page}`
     );
 
-    console.log("✅ Fetched Aparadh articles:", res.data);
+    // console.log("✅ Fetched Aparadh articles:", res.data);
 
     // Transform response for easier frontend use
     return res.data.map((post) => {
@@ -962,7 +962,7 @@ export const getMiscellaneousArticles = async (page = 1, perPage = 20) => {
       `${API_URL}/posts?categories=1&_embed&per_page=${perPage}&page=${page}`
     );
 
-    console.log("✅ Fetched Aparadh articles:", res.data);
+    // console.log("✅ Fetched Aparadh articles:", res.data);
 
     // Transform response for easier frontend use
     return res.data.map((post) => {
@@ -999,7 +999,7 @@ export const getBiseshArticles = async (page = 1, perPage = 20) => {
     const res = await axios.get(
       `${API_URL}/posts?categories=497&_embed&per_page=${perPage}&page=${page}`
     );
-    console.log("✅ Fetched Bisesh articles:", res.data);
+    // console.log("✅ Fetched Bisesh articles:", res.data);
 
     return res.data.map((post) => {
       const media = post._embedded?.["wp:featuredmedia"]?.[0];
@@ -1034,7 +1034,7 @@ export const getRajdhaniArticles = async (page = 1, perPage = 20) => {
     const res = await axios.get(
       `${API_URL}/posts?categories=32&_embed&per_page=${perPage}&page=${page}`
     );
-    console.log("✅ Fetched Rajdhani articles:", res.data);
+    // console.log("✅ Fetched Rajdhani articles:", res.data);
 
     return res.data.map((post) => {
       const media = post._embedded?.["wp:featuredmedia"]?.[0];
@@ -1067,7 +1067,7 @@ export const getRajnitiArticles = async (page = 1, perPage = 20) => {
     const res = await axios.get(
       `${API_URL}/posts?categories=31&_embed&per_page=${perPage}&page=${page}`
     );
-    console.log("✅ Fetched Rajniti articles:", res.data);
+    // console.log("✅ Fetched Rajniti articles:", res.data);
 
     return res.data.map((post) => {
       const media = post._embedded?.["wp:featuredmedia"]?.[0];
@@ -1100,7 +1100,7 @@ export const getRajyaArticles = async (page = 1, perPage = 20) => {
     const res = await axios.get(
       `${API_URL}/posts?categories=34&_embed&per_page=${perPage}&page=${page}`
     );
-    console.log("✅ Fetched Rajya articles:", res.data);
+    // console.log("✅ Fetched Rajya articles:", res.data);
 
     return res.data.map((post) => {
       const media = post._embedded?.["wp:featuredmedia"]?.[0];
@@ -1133,7 +1133,7 @@ export const getZillaArticles = async (page = 1, perPage = 20) => {
     const res = await axios.get(
       `${API_URL}/posts?categories=33&_embed&per_page=${perPage}&page=${page}`
     );
-    console.log("✅ Fetched Zilla articles:", res.data);
+    // console.log("✅ Fetched Zilla articles:", res.data);
 
     return res.data.map((post) => {
       const media = post._embedded?.["wp:featuredmedia"]?.[0];
@@ -1161,4 +1161,34 @@ export const getZillaArticles = async (page = 1, perPage = 20) => {
     console.error("❌ Error fetching Zilla articles:", error);
     return [];
   }
+};
+
+// GET Previous Article by date
+export const getPreviousArticle = async (publishedAt) => {
+  const res = await axios.get(
+    `${API_URL}/posts?before=${publishedAt}&orderby=date&order=desc&per_page=1&_embed`
+  );
+
+  const post = res.data?.[0];
+  if (!post) return null;
+
+  return {
+    title: post.title.rendered,
+    slug: post.slug,
+  };
+};
+
+// GET Next Article by date
+export const getNextArticle = async (publishedAt) => {
+  const res = await axios.get(
+    `${API_URL}/posts?after=${publishedAt}&orderby=date&order=asc&per_page=1&_embed`
+  );
+
+  const post = res.data?.[0];
+  if (!post) return null;
+
+  return {
+    title: post.title.rendered,
+    slug: post.slug,
+  };
 };
