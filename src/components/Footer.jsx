@@ -13,7 +13,6 @@ import { FaTwitter } from "react-icons/fa6";
 import { FaLinkedinIn } from "react-icons/fa6";
 import { FaYoutube } from "react-icons/fa6";
 
-
 const Footer = () => {
   return (
     <footer className="bg-[#0b1120] text-gray-300 pt-14 pb-8 border-t-4 border-red-600">
@@ -25,10 +24,15 @@ const Footer = () => {
             Subscribe to Janjagaran
           </h3>
           <p className="text-sm text-gray-400 mb-5 leading-relaxed">
-          Jan Jagaran News is dedicated to delivering reliable and trustworthy news to our readers in Odisha and beyond. We strive to be a leading source of information, keeping you informed about local, national, and international news with integrity and accuracy.
+            Jan Jagaran News is dedicated to delivering reliable and trustworthy
+            news to our readers in Odisha and beyond. We strive to be a leading
+            source of information, keeping you informed about local, national,
+            and international news with integrity and accuracy.
           </p>
 
-          <div className="text-sm text-gray-400 mb-1 leading-relaxed">GST: 21AVIPS5975M1ZV</div>
+          <div className="text-sm text-gray-400 mb-1 leading-relaxed">
+            GST: 21AVIPS5975M1ZV
+          </div>
 
           {/* <form className="flex bg-transparent border border-gray-700 rounded-md overflow-hidden w-full max-w-md mb-3">
             <input
@@ -103,16 +107,16 @@ const Footer = () => {
           </h4>
           <ul className="grid grid-cols-2 gap-y-2 text-sm text-gray-400">
             {[
-              { name: "Crime",       slug: "aparadh" },
-              { name: "Regional",    slug: "ଆଞ୍ଚଳିକ" },
-              { name: "Sports",      slug: "ଖେଳ" },
-              { name: "Life Style",  slug: "ଜୀବନଚର୍ଯ୍ୟା" },
+              { name: "Crime", slug: "aparadh" },
+              { name: "Regional", slug: "ଆଞ୍ଚଳିକ" },
+              { name: "Sports", slug: "ଖେଳ" },
+              { name: "Life Style", slug: "ଜୀବନଚର୍ଯ୍ୟା" },
               { name: "National", slug: "ଦେଶ-ବିଦେଶ" },
-              { name: "Tourism",     slug: "ପର୍ଯ୍ୟଟନ" },
-              { name: "Special",     slug: "ବିଶେଷ" },
-              { name: "Capital",     slug: "ରାଜଧାନୀ" },
-              { name: "Politics",    slug: "ରାଜନୀତି" },
-              { name: "State",       slug: "ରାଜ୍ୟ" },
+              { name: "Tourism", slug: "ପର୍ଯ୍ୟଟନ" },
+              { name: "Special", slug: "ବିଶେଷ" },
+              { name: "Capital", slug: "ରାଜଧାନୀ" },
+              { name: "Politics", slug: "ରାଜନୀତି" },
+              { name: "State", slug: "ରାଜ୍ୟ" },
             ].map((item, i) => (
               <li key={i} className="hover:text-red-500 cursor-pointer">
                 <a href={`/category/${item.slug}`}>{item.name}</a>
@@ -122,7 +126,7 @@ const Footer = () => {
         </div>
 
         {/* Social Media */}
-        <div>
+        {/* <div>
           <h4 className="flex items-center text-lg font-semibold text-white mb-3">
             <span className="w-[2px] h-5 bg-red-600 mr-2 rounded"></span>
             Social Media
@@ -144,7 +148,58 @@ const Footer = () => {
               <FaYoutube /> YouTube
             </li>
           </ul>
-        </div>
+        </div> */}
+       <div>
+  <h4 className="flex items-center text-lg font-semibold text-white mb-3">
+    <span className="w-[2px] h-5 bg-red-600 mr-2 rounded"></span>
+    Social Media
+  </h4>
+
+  <ul className="space-y-2 text-sm text-gray-400">
+
+    {/* Facebook */}
+    <li>
+      <a
+        href="https://www.facebook.com/JanJagaranNews"
+        className="flex items-center gap-2 hover:text-red-500 cursor-pointer"
+      >
+        <FaFacebookF /> Facebook
+      </a>
+    </li>
+
+    {/* Instagram */}
+    <li className="flex items-center gap-2 hover:text-red-500 cursor-pointer">
+      <FaInstagram /> Instagram
+    </li>
+
+    {/* Twitter / X */}
+    <li>
+      <a
+        href="https://x.com/janjagaran_news"
+        className="flex items-center gap-2 hover:text-red-500 cursor-pointer"
+      >
+        <FaTwitter /> Twitter
+      </a>
+    </li>
+
+    {/* LinkedIn */}
+    <li className="flex items-center gap-2 hover:text-red-500 cursor-pointer">
+      <FaLinkedinIn /> LinkedIn
+    </li>
+
+    {/* YouTube */}
+    <li>
+      <a
+        href="https://www.youtube.com/channel/UC9hJz9gZPT2ZGLf4z79SLPw"
+        className="flex items-center gap-2 hover:text-red-500 cursor-pointer"
+      >
+        <FaYoutube /> YouTube
+      </a>
+    </li>
+
+  </ul>
+</div>
+
       </div>
 
       {/* Divider */}
@@ -153,7 +208,8 @@ const Footer = () => {
           <p>Copyright © 2025 • All Rights Reserved</p>
           <div className="flex items-center gap-4 mt-3 md:mt-0">
             <p>
-              Made with <span className="text-red-500">♥</span> <a href="https://www.trackepay.in/">Trackepay</a>
+              Made with <span className="text-red-500">♥</span>{" "}
+              <a href="https://www.trackepay.in/">Trackepay</a>
             </p>
             {/* <button className="bg-[#f5f5f5] text-black text-xs px-3 py-1 rounded-full font-medium hover:bg-gray-200 transition">
               Made in Trackepay
