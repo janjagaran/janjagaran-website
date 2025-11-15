@@ -1609,7 +1609,7 @@ const Navbar = () => {
                    <div className="hidden sm:block w-full bg-[#0b1120] text-white shadow-md">
              <div className="max-w-7xl mx-auto flex justify-between items-center font-inter">
                <div>
-                 Udyam Registration Number: UDYAM-OD-02-0024515
+                 URN: UD-OD-02-0024515
                </div>
                <div>
                GST: 21AVIPS5975M1ZV
