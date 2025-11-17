@@ -39,7 +39,7 @@ export const onRequest = async ({ request, next }) => {
               media.media_details?.sizes?.full?.source_url ||
               null;
 
-            // Rewrite app. → cdn.
+            // Rewrite app → cdn for featured image
             if (image && image.startsWith("https://app.janjagaran.com")) {
               image = image.replace(
                 "https://app.janjagaran.com",
@@ -95,7 +95,7 @@ export const onRequest = async ({ request, next }) => {
   }
 
   // ------------------------------------------------------
-  // FORCE REPLACE ALL EXISTING IMAGE TAGS
+  // FORCE REPLACE ALL EXISTING OG + TWITTER IMAGE TAGS
   // ------------------------------------------------------
   if (meta) {
     html = html
@@ -108,6 +108,14 @@ export const onRequest = async ({ request, next }) => {
         `property="twitter:image" content="${meta.image}"`
       );
   }
+
+  // ------------------------------------------------------
+  // GLOBAL CDN REWRITE FOR ALL IMAGES
+  // ------------------------------------------------------
+  html = html.replace(
+    /https:\/\/app\.janjagaran\.com/gi,
+    "https://cdn.janjagaran.com"
+  );
 
   // ------------------------------------------------------
   // INSERT CLEAN NEW OG TAG BLOCK
