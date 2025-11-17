@@ -9,12 +9,14 @@ export const onRequest = async ({ request, next }) => {
 
   let meta = null;
 
-  // Detect article URL structure: /news/your-article-slug
+  // Detect article pages like: /news/my-article-slug
   if (url.pathname.startsWith("/news/")) {
     const slug = url.pathname.split("/").pop();
 
     try {
-      const apiRes = await fetch(`https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}&_embed`);
+      const apiRes = await fetch(
+        `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
+      );
       const data = await apiRes.json();
 
       if (Array.isArray(data) && data.length > 0) {
@@ -22,41 +24,61 @@ export const onRequest = async ({ request, next }) => {
 
         const title = post.title?.rendered || "Janjagaran News";
 
-        // Featured Image
-        let image =
+        const image =
           post.yoast_head_json?.og_image?.[0]?.url ||
-          post._embedded?.["wp:featuredmedia"]?.[0]?.source_url ||
+          post.featured_media_url ||
           "https://www.janjagaran.com/default-og.jpg";
 
-        // Description
         const desc =
-          post.yoast_head_json?.description ||
+          post.yoast_head_json?.og_description ||
           post.excerpt?.rendered?.replace(/<[^>]+>/g, "") ||
-          "Latest Odisha news from Janjagaran.";
+          "Latest Odisha news from Janjagaran";
 
         meta = { title, image, desc };
       }
     } catch (e) {}
   }
 
-  // Title replacement
+  // -----------------------------------------------------------
+  // REPLACE ALL TITLE FIELDS GLOBALLY (Fixes Default Title)
+  // -----------------------------------------------------------
+
   if (meta) {
-    html = html.replace(
-      /<title>(.*?)<\/title>/i,
-      `<title>${meta.title}</title>`
-    );
+    const safeTitle = meta.title.replace(/"/g, "");
+
+    html = html
+      .replace(/<title>(.*?)<\/title>/gi, `<title>${safeTitle}</title>`)
+      .replace(
+        /property="og:title" content="(.*?)"/gi,
+        `property="og:title" content="${safeTitle}"`
+      )
+      .replace(
+        /property="twitter:title" content="(.*?)"/gi,
+        `property="twitter:title" content="${safeTitle}"`
+      );
   } else {
-    html = html.replace(
-      /<title>(.*?)<\/title>/i,
-      "<title>Janjagaran News, Odisha Local News</title>"
-    );
+    const defaultTitle = "Janjagaran News, Odisha Local News";
+
+    html = html
+      .replace(/<title>(.*?)<\/title>/gi, `<title>${defaultTitle}</title>`)
+      .replace(
+        /property="og:title" content="(.*?)"/gi,
+        `property="og:title" content="${defaultTitle}"`
+      )
+      .replace(
+        /property="twitter:title" content="(.*?)"/gi,
+        `property="twitter:title" content="${defaultTitle}"`
+      );
   }
 
-  // Build OG tags
-  let ogTags = "";
+  // -----------------------------------------------------------
+  // BUILD OG TAGS FOR ARTICLE PAGES
+  // -----------------------------------------------------------
+
+  let og = "";
 
   if (meta) {
-    ogTags = `
+    og = `
 <meta property="og:title" content="${meta.title}">
 <meta property="og:description" content="${meta.desc}">
 <meta property="og:image" content="${meta.image}">
@@ -70,7 +92,10 @@ export const onRequest = async ({ request, next }) => {
 `;
   }
 
-  // Copy protection
+  // -----------------------------------------------------------
+  // COPY AND RIGHT CLICK PROTECTION
+  // -----------------------------------------------------------
+
   const protect = `
 <style>
   html, body, * { user-select: none !important; }
@@ -108,14 +133,18 @@ export const onRequest = async ({ request, next }) => {
 </script>
 `;
 
-  const finalInject = ogTags + protect;
+  // -----------------------------------------------------------
+  // INSERT OG TAGS AND PROTECTION
+  // -----------------------------------------------------------
+
+  const insert = og + protect;
 
   if (html.includes("</head>")) {
-    html = html.replace("</head>", finalInject + "</head>");
+    html = html.replace("</head>", insert + "</head>");
   } else if (html.includes("</body>")) {
-    html = html.replace("</body>", finalInject + "</body>");
+    html = html.replace("</body>", insert + "</body>");
   } else {
-    html = finalInject + html;
+    html = insert + html;
   }
 
   const headers = new Headers(res.headers);
