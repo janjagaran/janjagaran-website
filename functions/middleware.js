@@ -5,10 +5,14 @@ export const onRequest = async ({ request, next }) => {
 
   let html = await res.text();
   const url = new URL(request.url);
+  const path = url.pathname;
 
-  // -------- EXCLUSION RULES --------
+  // Default OG image
+  const DEFAULT_OG = "https://cdn.janjagaran.com/wp-content/uploads/2025/11/og-janjagaran.jpg";
+
+  // Excluded static pages
   const excludedPaths = [
-    "/", 
+    "/",                       // homepage only
     "/about-us",
     "/author",
     "/contact-us",
@@ -16,71 +20,71 @@ export const onRequest = async ({ request, next }) => {
     "/terms-and-condition"
   ];
 
-  const path = url.pathname;
-
   const isCategory = path.startsWith("/category");
-  const isExcluded = excludedPaths.includes(path) || isCategory;
+  const isStaticExcluded = excludedPaths.includes(path) || isCategory;
 
-  // If excluded page, show default OG
-  const DEFAULT_OG = "https://cdn.janjagaran.com/wp-content/uploads/2025/11/og-janjagaran.jpg";
+  // Article detection:
+  // A valid article slug:
+  // - Single path segment
+  // - Not excluded
+  const segments = path.split("/").filter(Boolean);
+  const isSingleSlug = segments.length === 1;
+  const isArticle = isSingleSlug && !isStaticExcluded;
 
   let meta = null;
 
-  // -------- ARTICLE DETECTION --------
-  if (!isExcluded) {
-    // A valid article slug should be a single-segment path
-    const slug = path.split("/").filter(Boolean).pop();
+  // ---------- FETCH ARTICLE DATA ----------
+  if (isArticle) {
+    const slug = segments[0];
 
-    if (slug) {
-      try {
-        const postRes = await fetch(
-          `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
-        );
-        const posts = await postRes.json();
+    try {
+      const postRes = await fetch(
+        `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
+      );
+      const posts = await postRes.json();
 
-        if (Array.isArray(posts) && posts.length > 0) {
-          const post = posts[0];
+      if (Array.isArray(posts) && posts.length > 0) {
+        const post = posts[0];
 
-          const title = post.title?.rendered || "Janjagaran News";
+        const title = post.title?.rendered || "Janjagaran News";
 
-          // Fetch featured image
-          let image = null;
+        // Load featured image
+        let image = null;
 
-          if (post.featured_media) {
-            try {
-              const mediaRes = await fetch(
-                `https://app.janjagaran.com/wp-json/wp/v2/media/${post.featured_media}`
+        if (post.featured_media) {
+          try {
+            const mediaRes = await fetch(
+              `https://app.janjagaran.com/wp-json/wp/v2/media/${post.featured_media}`
+            );
+            const media = await mediaRes.json();
+
+            image =
+              media.source_url ||
+              media.media_details?.sizes?.full?.source_url ||
+              null;
+
+            // Rewrite app → cdn
+            if (image && image.startsWith("https://app.janjagaran.com")) {
+              image = image.replace(
+                "https://app.janjagaran.com",
+                "https://cdn.janjagaran.com"
               );
-              const media = await mediaRes.json();
-
-              image =
-                media.source_url ||
-                media.media_details?.sizes?.full?.source_url ||
-                null;
-
-              // Rewrite app → cdn
-              if (image && image.startsWith("https://app.janjagaran.com")) {
-                image = image.replace(
-                  "https://app.janjagaran.com",
-                  "https://cdn.janjagaran.com"
-                );
-              }
-            } catch (e) {}
-          }
-
-          if (!image) image = DEFAULT_OG;
-
-          const desc =
-            post.excerpt?.rendered?.replace(/<[^>]+>/g, "") ||
-            "Latest Odisha news from Janjagaran";
-
-          meta = { title, image, desc };
+            }
+          } catch (e) {}
         }
-      } catch (e) {}
-    }
+
+        if (!image) image = DEFAULT_OG;
+
+        const desc =
+          post.excerpt?.rendered?.replace(/<[^>]+>/g, "") ||
+          "Latest Odisha news from Janjagaran";
+
+        meta = { title, image, desc };
+      }
+    } catch (e) {}
   }
 
-  // -------- META REPLACEMENT --------
+  // ---------- META REPLACEMENT ----------
   if (meta) {
     const safe = meta.title.replace(/"/g, "");
 
@@ -93,16 +97,16 @@ export const onRequest = async ({ request, next }) => {
       .replace(/property="og:description" content="(.*?)"/gi, `property="og:description" content="${meta.desc}"`)
       .replace(/property="twitter:description" content="(.*?)"/gi, `property="twitter:description" content="${meta.desc}"`);
   } else {
-    // Default OG for excluded pages
+    // Use default OG ONLY for excluded pages
     html = html
       .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${DEFAULT_OG}"`)
       .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${DEFAULT_OG}"`);
   }
 
-  // GLOBAL CDN REWRITE
+  // ---------- GLOBAL CDN REWRITE ----------
   html = html.replace(/https:\/\/app\.janjagaran\.com/gi, "https://cdn.janjagaran.com");
 
-  // -------- COPY PROTECTION --------
+  // ---------- COPY PROTECTION ----------
   const protect = `
 <style>
   html, body, * { user-select: none !important; }
@@ -137,7 +141,7 @@ export const onRequest = async ({ request, next }) => {
 </script>
 `;
 
-  // Inject into <head>
+  // Inject copy protection and OG block at end of head
   if (html.includes("</head>")) {
     html = html.replace("</head>", protect + "</head>");
   } else {
