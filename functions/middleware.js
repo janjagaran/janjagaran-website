@@ -8,12 +8,11 @@ export const onRequest = async ({ request, next }) => {
 
   let meta = null;
 
-  // Detect article URLs like /news/my-slug
+  // Detect article URLs
   if (url.pathname.startsWith("/news/")) {
     const slug = url.pathname.split("/").pop();
 
     try {
-      // Fetch the article
       const postRes = await fetch(
         `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
       );
@@ -24,8 +23,9 @@ export const onRequest = async ({ request, next }) => {
 
         const title = post.title?.rendered || "Janjagaran News";
 
-        // Always load featured image
         let image = null;
+
+        // Always fetch featured media
         if (post.featured_media) {
           try {
             const mediaRes = await fetch(
@@ -40,7 +40,11 @@ export const onRequest = async ({ request, next }) => {
           } catch (e) {}
         }
 
-        // If no featured image found, fallback
+        // If still missing, try CDN domain
+        if (!image && post.featured_media) {
+          image = `https://cdn.janjagaran.com/wp-content/uploads/${post.featured_media}.jpg`;
+        }
+
         if (!image) {
           image = "https://www.janjagaran.com/default-og.jpg";
         }
@@ -54,7 +58,7 @@ export const onRequest = async ({ request, next }) => {
     } catch (e) {}
   }
 
-  // Replace all title variations
+  // Replace title everywhere
   if (meta) {
     const safe = meta.title.replace(/"/g, "");
 
@@ -62,16 +66,16 @@ export const onRequest = async ({ request, next }) => {
       .replace(/<title>(.*?)<\/title>/gi, `<title>${safe}</title>`)
       .replace(/property="og:title" content="(.*?)"/gi, `property="og:title" content="${safe}"`)
       .replace(/property="twitter:title" content="(.*?)"/gi, `property="twitter:title" content="${safe}"`);
-  } else {
-    const def = "Janjagaran News, Odisha Local News";
-
-    html = html
-      .replace(/<title>(.*?)<\/title>/gi, `<title>${def}</title>`)
-      .replace(/property="og:title" content="(.*?)"/gi, `property="og:title" content="${def}"`)
-      .replace(/property="twitter:title" content="(.*?)"/gi, `property="twitter:title" content="${def}"`);
   }
 
-  // Build OG tags
+  // FORCE replace existing og:image and twitter:image
+  if (meta) {
+    html = html
+      .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${meta.image}"`)
+      .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${meta.image}"`);
+  }
+
+  // Build new OG tags (inserted on top)
   let og = "";
   if (meta) {
     og = `
