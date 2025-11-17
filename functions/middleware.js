@@ -10,9 +10,10 @@ export const onRequest = async ({ request, next }) => {
 
   // Detect article URLs
   if (url.pathname.startsWith("/news/")) {
-    const slug = url.pathname.split("/").pop();
+    const slug = url.pathname.split("/").filter(Boolean).pop();
 
     try {
+      // Fetch WordPress post
       const postRes = await fetch(
         `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
       );
@@ -23,9 +24,9 @@ export const onRequest = async ({ request, next }) => {
 
         const title = post.title?.rendered || "Janjagaran News";
 
+        // Fetch featured image
         let image = null;
 
-        // Always fetch featured media
         if (post.featured_media) {
           try {
             const mediaRes = await fetch(
@@ -37,14 +38,18 @@ export const onRequest = async ({ request, next }) => {
               media.source_url ||
               media.media_details?.sizes?.full?.source_url ||
               null;
-          } catch (e) {}
+
+            // Rewrite app. → cdn.
+            if (image && image.startsWith("https://app.janjagaran.com")) {
+              image = image.replace(
+                "https://app.janjagaran.com",
+                "https://cdn.janjagaran.com"
+              );
+            }
+          } catch (err) {}
         }
 
-        // If still missing, try CDN domain
-        if (!image && post.featured_media) {
-          image = `https://cdn.janjagaran.com/wp-content/uploads/${post.featured_media}.jpg`;
-        }
-
+        // Fallback
         if (!image) {
           image = "https://www.janjagaran.com/default-og.jpg";
         }
@@ -58,24 +63,55 @@ export const onRequest = async ({ request, next }) => {
     } catch (e) {}
   }
 
-  // Replace title everywhere
+  // ------------------------------------------------------
+  // REPLACE ALL TITLE VARIANTS
+  // ------------------------------------------------------
   if (meta) {
     const safe = meta.title.replace(/"/g, "");
 
     html = html
       .replace(/<title>(.*?)<\/title>/gi, `<title>${safe}</title>`)
-      .replace(/property="og:title" content="(.*?)"/gi, `property="og:title" content="${safe}"`)
-      .replace(/property="twitter:title" content="(.*?)"/gi, `property="twitter:title" content="${safe}"`);
+      .replace(
+        /property="og:title" content="(.*?)"/gi,
+        `property="og:title" content="${safe}"`
+      )
+      .replace(
+        /property="twitter:title" content="(.*?)"/gi,
+        `property="twitter:title" content="${safe}"`
+      );
+  } else {
+    const def = "Janjagaran News, Odisha Local News";
+
+    html = html
+      .replace(/<title>(.*?)<\/title>/gi, `<title>${def}</title>`)
+      .replace(
+        /property="og:title" content="(.*?)"/gi,
+        `property="og:title" content="${def}"`
+      )
+      .replace(
+        /property="twitter:title" content="(.*?)"/gi,
+        `property="twitter:title" content="${def}"`
+      );
   }
 
-  // FORCE replace existing og:image and twitter:image
+  // ------------------------------------------------------
+  // FORCE REPLACE ALL EXISTING IMAGE TAGS
+  // ------------------------------------------------------
   if (meta) {
     html = html
-      .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${meta.image}"`)
-      .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${meta.image}"`);
+      .replace(
+        /property="og:image" content="(.*?)"/gi,
+        `property="og:image" content="${meta.image}"`
+      )
+      .replace(
+        /property="twitter:image" content="(.*?)"/gi,
+        `property="twitter:image" content="${meta.image}"`
+      );
   }
 
-  // Build new OG tags (inserted on top)
+  // ------------------------------------------------------
+  // INSERT CLEAN NEW OG TAG BLOCK
+  // ------------------------------------------------------
   let og = "";
   if (meta) {
     og = `
@@ -92,7 +128,9 @@ export const onRequest = async ({ request, next }) => {
 `;
   }
 
-  // Copy protection
+  // ------------------------------------------------------
+  // COPY PROTECTION
+  // ------------------------------------------------------
   const protect = `
 <style>
   html, body, * { user-select: none !important; }
@@ -102,7 +140,6 @@ export const onRequest = async ({ request, next }) => {
 <script>
 (function(){
   function block(e){ e.preventDefault(); e.stopImmediatePropagation(); return false; }
-
   const ev = ["copy","cut","contextmenu","selectstart","dragstart"];
   ev.forEach(a => window.addEventListener(a, block, true));
 
