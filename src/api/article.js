@@ -1054,7 +1054,7 @@ export const getRajdhaniArticles = async (page = 1, perPage = 20) => {
         image,
         author: post._embedded?.author?.[0]?.name || "Anonymous",
         link: post.link,
-      };
+      };  
     });
   } catch (error) {
     console.error("❌ Error fetching Rajdhani articles:", error);
