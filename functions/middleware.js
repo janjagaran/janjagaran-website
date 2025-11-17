@@ -1,3 +1,4 @@
+console.log("🔥 Middleware is running", request.url);
 export const onRequest = async ({ request, next }) => {
   const res = await next();
   const type = res.headers.get("content-type") || "";
