@@ -8,11 +8,12 @@ export const onRequest = async ({ request, next }) => {
   const path = url.pathname;
 
   // Default OG image
-  const DEFAULT_OG = "https://cdn.janjagaran.com/wp-content/uploads/2025/11/og-janjagaran.jpg";
+  const DEFAULT_OG =
+    "https://cdn.janjagaran.com/wp-content/uploads/2025/11/og-janjagaran.jpg";
 
-  // Excluded pages that should always show default OG
+  // Excluded pages
   const excludedPaths = [
-    "/",                      
+    "/", // homepage only
     "/about-us",
     "/author",
     "/contact-us",
@@ -23,20 +24,26 @@ export const onRequest = async ({ request, next }) => {
   const isCategory = path.startsWith("/category");
   const isStaticExcluded = excludedPaths.includes(path) || isCategory;
 
-  // Article detection: ONLY URLs inside /news/
-  const isArticle = path.startsWith("/news/") && !isStaticExcluded;
+  // ARTICLE DETECTION:
+  // Your routes use: "/:slug"
+  // So article must:
+  //  - Be a single-segment URL
+  //  - Not be excluded
+  //  - Not be a category
+  const segments = path.split("/").filter(Boolean);
+  const isArticle =
+    segments.length === 1 && !isStaticExcluded && !isCategory;
 
   let meta = null;
 
   // ---------- FETCH WORDPRESS ARTICLE ----------
   if (isArticle) {
-    const slug = path.split("/").pop(); // last part after /news/
+    const slug = segments[0];
 
     try {
       const postRes = await fetch(
         `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
       );
-
       const posts = await postRes.json();
 
       if (Array.isArray(posts) && posts.length > 0) {
@@ -60,7 +67,10 @@ export const onRequest = async ({ request, next }) => {
               null;
 
             // Rewrite app → cdn
-            if (image && image.startsWith("https://app.janjagaran.com")) {
+            if (
+              image &&
+              image.startsWith("https://app.janjagaran.com")
+            ) {
               image = image.replace(
                 "https://app.janjagaran.com",
                 "https://cdn.janjagaran.com"
@@ -82,27 +92,63 @@ export const onRequest = async ({ request, next }) => {
 
   // ---------- META REPLACEMENT ----------
   if (meta) {
-    const safe = meta.title.replace(/"/g, "");
+    const safeTitle = meta.title.replace(/"/g, "");
 
     html = html
-      .replace(/<title>(.*?)<\/title>/gi, `<title>${safe}</title>`)
-      .replace(/property="og:title" content="(.*?)"/gi, `property="og:title" content="${safe}"`)
-      .replace(/property="twitter:title" content="(.*?)"/gi, `property="twitter:title" content="${safe}"`)
-      .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${meta.image}"`)
-      .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${meta.image}"`)
-      .replace(/property="og:description" content="(.*?)"/gi, `property="og:description" content="${meta.desc}"`)
-      .replace(/property="twitter:description" content="(.*?)"/gi, `property="twitter:description" content="${meta.desc}"`);
+      // Title
+      .replace(/<title>(.*?)<\/title>/gi, `<title>${safeTitle}</title>`)
+
+      // OG Title
+      .replace(
+        /property="og:title" content="(.*?)"/gi,
+        `property="og:title" content="${safeTitle}"`
+      )
+
+      // Twitter Title
+      .replace(
+        /property="twitter:title" content="(.*?)"/gi,
+        `property="twitter:title" content="${safeTitle}"`
+      )
+
+      // Image
+      .replace(
+        /property="og:image" content="(.*?)"/gi,
+        `property="og:image" content="${meta.image}"`
+      )
+      .replace(
+        /property="twitter:image" content="(.*?)"/gi,
+        `property="twitter:image" content="${meta.image}"`
+      )
+
+      // Description
+      .replace(
+        /property="og:description" content="(.*?)"/gi,
+        `property="og:description" content="${meta.desc}"`
+      )
+      .replace(
+        /property="twitter:description" content="(.*?)"/gi,
+        `property="twitter:description" content="${meta.desc}"`
+      );
   } else {
-    // Static pages fallback
+    // ---------- DEFAULT OG ----------
     html = html
-      .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${DEFAULT_OG}"`)
-      .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${DEFAULT_OG}"`);
+      .replace(
+        /property="og:image" content="(.*?)"/gi,
+        `property="og:image" content="${DEFAULT_OG}"`
+      )
+      .replace(
+        /property="twitter:image" content="(.*?)"/gi,
+        `property="twitter:image" content="${DEFAULT_OG}"`
+      );
   }
 
-  // ---------- GLOBAL CDN REWRITE ----------
-  html = html.replace(/https:\/\/app\.janjagaran\.com/gi, "https://cdn.janjagaran.com");
+  // ---------- CDN REWRITE ----------
+  html = html.replace(
+    /https:\/\/app\.janjagaran\.com/gi,
+    "https://cdn.janjagaran.com"
+  );
 
-  // ---------- COPY PROTECTION ----------
+  // ---------- COPY / RIGHT-CLICK DISABLE ----------
   const protect = `
 <style>
   html, body, * { user-select: none !important; }
@@ -112,26 +158,21 @@ export const onRequest = async ({ request, next }) => {
 <script>
 (function(){
   function block(e){ e.preventDefault(); e.stopImmediatePropagation(); return false; }
-  const ev = ["copy","cut","contextmenu","selectstart","dragstart"];
-  ev.forEach(a => window.addEventListener(a, block, true));
-
+  const events = ["copy","cut","contextmenu","selectstart","dragstart"];
+  events.forEach(ev => window.addEventListener(ev, block, true));
   window.addEventListener("mousedown", e => { if (e.button === 2) block(e); }, true);
-
   window.addEventListener("keydown", e => {
     const k = (e.key || "").toLowerCase();
-    const c = e.ctrlKey || e.metaKey;
-    if (c && ["c","x","s","u","a","p","i"].includes(k)) return block(e);
+    const combo = e.ctrlKey || e.metaKey;
+    if (combo && ["c","x","s","u","a","p","i"].includes(k)) return block(e);
     if (e.keyCode === 123) return block(e);
-    if (c && e.shiftKey && ["i","j","k"].includes(k)) return block(e);
+    if (combo && e.shiftKey && ["i","j","k"].includes(k)) return block(e);
   }, true);
-
   document.addEventListener("dblclick", block, true);
-
   setInterval(() => {
-    const s = window.getSelection();
-    if (s && s.toString().length) s.removeAllRanges();
+    const sel = window.getSelection();
+    if (sel && sel.toString().length) sel.removeAllRanges();
   }, 150);
-
   document.documentElement.setAttribute("oncontextmenu", "return false");
 })();
 </script>
