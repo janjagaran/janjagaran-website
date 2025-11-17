@@ -8,12 +8,12 @@ export const onRequest = async ({ request, next }) => {
 
   let meta = null;
 
-  // Detect article URLs
+  // Detect article URLs like /news/slug
   if (url.pathname.startsWith("/news/")) {
     const slug = url.pathname.split("/").filter(Boolean).pop();
 
     try {
-      // Fetch WordPress post
+      // Fetch post
       const postRes = await fetch(
         `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
       );
@@ -24,7 +24,7 @@ export const onRequest = async ({ request, next }) => {
 
         const title = post.title?.rendered || "Janjagaran News";
 
-        // Fetch featured image
+        // Load featured image
         let image = null;
 
         if (post.featured_media) {
@@ -39,17 +39,16 @@ export const onRequest = async ({ request, next }) => {
               media.media_details?.sizes?.full?.source_url ||
               null;
 
-            // Rewrite app → cdn for featured image
+            // Convert app → cdn
             if (image && image.startsWith("https://app.janjagaran.com")) {
               image = image.replace(
                 "https://app.janjagaran.com",
                 "https://cdn.janjagaran.com"
               );
             }
-          } catch (err) {}
+          } catch (e) {}
         }
 
-        // Fallback
         if (!image) {
           image = "https://www.janjagaran.com/default-og.jpg";
         }
@@ -63,9 +62,7 @@ export const onRequest = async ({ request, next }) => {
     } catch (e) {}
   }
 
-  // ------------------------------------------------------
-  // REPLACE ALL TITLE VARIANTS
-  // ------------------------------------------------------
+  // Rewrite titles
   if (meta) {
     const safe = meta.title.replace(/"/g, "");
 
@@ -94,9 +91,7 @@ export const onRequest = async ({ request, next }) => {
       );
   }
 
-  // ------------------------------------------------------
-  // FORCE REPLACE ALL EXISTING OG + TWITTER IMAGE TAGS
-  // ------------------------------------------------------
+  // Replace OG + Twitter images
   if (meta) {
     html = html
       .replace(
@@ -109,17 +104,13 @@ export const onRequest = async ({ request, next }) => {
       );
   }
 
-  // ------------------------------------------------------
-  // GLOBAL CDN REWRITE FOR ALL IMAGES
-  // ------------------------------------------------------
+  // Global CDN rewrite for any remaining app URLs
   html = html.replace(
     /https:\/\/app\.janjagaran\.com/gi,
     "https://cdn.janjagaran.com"
   );
 
-  // ------------------------------------------------------
-  // INSERT CLEAN NEW OG TAG BLOCK
-  // ------------------------------------------------------
+  // New OG block
   let og = "";
   if (meta) {
     og = `
@@ -136,9 +127,7 @@ export const onRequest = async ({ request, next }) => {
 `;
   }
 
-  // ------------------------------------------------------
-  // COPY PROTECTION
-  // ------------------------------------------------------
+  // Copy protection
   const protect = `
 <style>
   html, body, * { user-select: none !important; }
@@ -173,6 +162,7 @@ export const onRequest = async ({ request, next }) => {
 </script>
 `;
 
+  // Inject OG + Copy protection into <head>
   const add = og + protect;
 
   if (html.includes("</head>")) {
