@@ -6,128 +6,103 @@ export const onRequest = async ({ request, next }) => {
   let html = await res.text();
   const url = new URL(request.url);
 
+  // -------- EXCLUSION RULES --------
+  const excludedPaths = [
+    "/", 
+    "/about-us",
+    "/author",
+    "/contact-us",
+    "/privacy-policy",
+    "/terms-and-condition"
+  ];
+
+  const path = url.pathname;
+
+  const isCategory = path.startsWith("/category");
+  const isExcluded = excludedPaths.includes(path) || isCategory;
+
+  // If excluded page, show default OG
+  const DEFAULT_OG = "https://cdn.janjagaran.com/wp-content/uploads/2025/11/og-janjagaran.jpg";
+
   let meta = null;
 
-  // Detect article URLs like /news/slug
-  if (url.pathname.startsWith("/news/")) {
-    const slug = url.pathname.split("/").filter(Boolean).pop();
+  // -------- ARTICLE DETECTION --------
+  if (!isExcluded) {
+    // A valid article slug should be a single-segment path
+    const slug = path.split("/").filter(Boolean).pop();
 
-    try {
-      // Fetch post
-      const postRes = await fetch(
-        `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
-      );
-      const posts = await postRes.json();
+    if (slug) {
+      try {
+        const postRes = await fetch(
+          `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
+        );
+        const posts = await postRes.json();
 
-      if (Array.isArray(posts) && posts.length > 0) {
-        const post = posts[0];
+        if (Array.isArray(posts) && posts.length > 0) {
+          const post = posts[0];
 
-        const title = post.title?.rendered || "Janjagaran News";
+          const title = post.title?.rendered || "Janjagaran News";
 
-        // Load featured image
-        let image = null;
+          // Fetch featured image
+          let image = null;
 
-        if (post.featured_media) {
-          try {
-            const mediaRes = await fetch(
-              `https://app.janjagaran.com/wp-json/wp/v2/media/${post.featured_media}`
-            );
-            const media = await mediaRes.json();
-
-            image =
-              media.source_url ||
-              media.media_details?.sizes?.full?.source_url ||
-              null;
-
-            // Convert app → cdn
-            if (image && image.startsWith("https://app.janjagaran.com")) {
-              image = image.replace(
-                "https://app.janjagaran.com",
-                "https://cdn.janjagaran.com"
+          if (post.featured_media) {
+            try {
+              const mediaRes = await fetch(
+                `https://app.janjagaran.com/wp-json/wp/v2/media/${post.featured_media}`
               );
-            }
-          } catch (e) {}
+              const media = await mediaRes.json();
+
+              image =
+                media.source_url ||
+                media.media_details?.sizes?.full?.source_url ||
+                null;
+
+              // Rewrite app → cdn
+              if (image && image.startsWith("https://app.janjagaran.com")) {
+                image = image.replace(
+                  "https://app.janjagaran.com",
+                  "https://cdn.janjagaran.com"
+                );
+              }
+            } catch (e) {}
+          }
+
+          if (!image) image = DEFAULT_OG;
+
+          const desc =
+            post.excerpt?.rendered?.replace(/<[^>]+>/g, "") ||
+            "Latest Odisha news from Janjagaran";
+
+          meta = { title, image, desc };
         }
-
-        if (!image) {
-          image = "https://www.janjagaran.com/default-og.jpg";
-        }
-
-        const desc =
-          post.excerpt?.rendered?.replace(/<[^>]+>/g, "") ||
-          "Latest Odisha news from Janjagaran";
-
-        meta = { title, image, desc };
-      }
-    } catch (e) {}
+      } catch (e) {}
+    }
   }
 
-  // Rewrite titles
+  // -------- META REPLACEMENT --------
   if (meta) {
     const safe = meta.title.replace(/"/g, "");
 
     html = html
       .replace(/<title>(.*?)<\/title>/gi, `<title>${safe}</title>`)
-      .replace(
-        /property="og:title" content="(.*?)"/gi,
-        `property="og:title" content="${safe}"`
-      )
-      .replace(
-        /property="twitter:title" content="(.*?)"/gi,
-        `property="twitter:title" content="${safe}"`
-      );
+      .replace(/property="og:title" content="(.*?)"/gi, `property="og:title" content="${safe}"`)
+      .replace(/property="twitter:title" content="(.*?)"/gi, `property="twitter:title" content="${safe}"`)
+      .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${meta.image}"`)
+      .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${meta.image}"`)
+      .replace(/property="og:description" content="(.*?)"/gi, `property="og:description" content="${meta.desc}"`)
+      .replace(/property="twitter:description" content="(.*?)"/gi, `property="twitter:description" content="${meta.desc}"`);
   } else {
-    const def = "Janjagaran News, Odisha Local News";
-
+    // Default OG for excluded pages
     html = html
-      .replace(/<title>(.*?)<\/title>/gi, `<title>${def}</title>`)
-      .replace(
-        /property="og:title" content="(.*?)"/gi,
-        `property="og:title" content="${def}"`
-      )
-      .replace(
-        /property="twitter:title" content="(.*?)"/gi,
-        `property="twitter:title" content="${def}"`
-      );
+      .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${DEFAULT_OG}"`)
+      .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${DEFAULT_OG}"`);
   }
 
-  // Replace OG + Twitter images
-  if (meta) {
-    html = html
-      .replace(
-        /property="og:image" content="(.*?)"/gi,
-        `property="og:image" content="${meta.image}"`
-      )
-      .replace(
-        /property="twitter:image" content="(.*?)"/gi,
-        `property="twitter:image" content="${meta.image}"`
-      );
-  }
+  // GLOBAL CDN REWRITE
+  html = html.replace(/https:\/\/app\.janjagaran\.com/gi, "https://cdn.janjagaran.com");
 
-  // Global CDN rewrite for any remaining app URLs
-  html = html.replace(
-    /https:\/\/app\.janjagaran\.com/gi,
-    "https://cdn.janjagaran.com"
-  );
-
-  // New OG block
-  let og = "";
-  if (meta) {
-    og = `
-<meta property="og:title" content="${meta.title}">
-<meta property="og:description" content="${meta.desc}">
-<meta property="og:image" content="${meta.image}">
-<meta property="og:url" content="${url.href}">
-<meta property="og:type" content="article">
-
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${meta.title}">
-<meta name="twitter:description" content="${meta.desc}">
-<meta name="twitter:image" content="${meta.image}">
-`;
-  }
-
-  // Copy protection
+  // -------- COPY PROTECTION --------
   const protect = `
 <style>
   html, body, * { user-select: none !important; }
@@ -162,13 +137,11 @@ export const onRequest = async ({ request, next }) => {
 </script>
 `;
 
-  // Inject OG + Copy protection into <head>
-  const add = og + protect;
-
+  // Inject into <head>
   if (html.includes("</head>")) {
-    html = html.replace("</head>", add + "</head>");
+    html = html.replace("</head>", protect + "</head>");
   } else {
-    html = add + html;
+    html = protect + html;
   }
 
   const headers = new Headers(res.headers);
