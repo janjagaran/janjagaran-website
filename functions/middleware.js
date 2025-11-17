@@ -10,9 +10,9 @@ export const onRequest = async ({ request, next }) => {
   // Default OG image
   const DEFAULT_OG = "https://cdn.janjagaran.com/wp-content/uploads/2025/11/og-janjagaran.jpg";
 
-  // Excluded static pages
+  // Excluded pages that should always show default OG
   const excludedPaths = [
-    "/",                       // homepage only
+    "/",                      
     "/about-us",
     "/author",
     "/contact-us",
@@ -23,24 +23,20 @@ export const onRequest = async ({ request, next }) => {
   const isCategory = path.startsWith("/category");
   const isStaticExcluded = excludedPaths.includes(path) || isCategory;
 
-  // Article detection:
-  // A valid article slug:
-  // - Single path segment
-  // - Not excluded
-  const segments = path.split("/").filter(Boolean);
-  const isSingleSlug = segments.length === 1;
-  const isArticle = isSingleSlug && !isStaticExcluded;
+  // Article detection: ONLY URLs inside /news/
+  const isArticle = path.startsWith("/news/") && !isStaticExcluded;
 
   let meta = null;
 
-  // ---------- FETCH ARTICLE DATA ----------
+  // ---------- FETCH WORDPRESS ARTICLE ----------
   if (isArticle) {
-    const slug = segments[0];
+    const slug = path.split("/").pop(); // last part after /news/
 
     try {
       const postRes = await fetch(
         `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
       );
+
       const posts = await postRes.json();
 
       if (Array.isArray(posts) && posts.length > 0) {
@@ -48,7 +44,7 @@ export const onRequest = async ({ request, next }) => {
 
         const title = post.title?.rendered || "Janjagaran News";
 
-        // Load featured image
+        // Fetch featured media
         let image = null;
 
         if (post.featured_media) {
@@ -97,7 +93,7 @@ export const onRequest = async ({ request, next }) => {
       .replace(/property="og:description" content="(.*?)"/gi, `property="og:description" content="${meta.desc}"`)
       .replace(/property="twitter:description" content="(.*?)"/gi, `property="twitter:description" content="${meta.desc}"`);
   } else {
-    // Use default OG ONLY for excluded pages
+    // Static pages fallback
     html = html
       .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${DEFAULT_OG}"`)
       .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${DEFAULT_OG}"`);
@@ -141,7 +137,6 @@ export const onRequest = async ({ request, next }) => {
 </script>
 `;
 
-  // Inject copy protection and OG block at end of head
   if (html.includes("</head>")) {
     html = html.replace("</head>", protect + "</head>");
   } else {
