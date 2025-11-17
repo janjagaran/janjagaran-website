@@ -1,17 +1,28 @@
 export const onRequest = async ({ request, next }) => {
-  const res = await next();
-  const type = res.headers.get("content-type") || "";
-  if (!type.includes("text/html")) return res;
+  // let the Pages runtime generate the base HTML
+  const originResponse = await next();
 
-  let html = await res.text();
+  // only handle HTML
+  const contentType = originResponse.headers.get("content-type") || "";
+  if (!contentType.includes("text/html")) return originResponse;
+
   const url = new URL(request.url);
   const path = url.pathname;
 
-  // Default OG image
-  const DEFAULT_OG =
-    "https://cdn.janjagaran.com/wp-content/uploads/2025/11/og-janjagaran.jpg";
+  // Cache key (use a separate GET request key)
+  const cacheKey = new Request("middleware-cache:" + url.href, { method: "GET" });
+  try {
+    const cached = await caches.default.match(cacheKey);
+    if (cached) return cached.clone();
+  } catch (e) {
+    // ignore cache errors
+  }
 
-  // Excluded pages
+  // read HTML
+  let html = await originResponse.text();
+
+  // defaults & exclusions
+  const DEFAULT_OG = "https://cdn.janjagaran.com/wp-content/uploads/2025/11/og-janjagaran.jpg";
   const excludedPaths = [
     "/", // homepage only
     "/about-us",
@@ -20,29 +31,23 @@ export const onRequest = async ({ request, next }) => {
     "/privacy-policy",
     "/terms-and-condition"
   ];
-
   const isCategory = path.startsWith("/category");
   const isStaticExcluded = excludedPaths.includes(path) || isCategory;
 
-  // ARTICLE DETECTION:
-  // Your routes use: "/:slug"
-  // So article must:
-  //  - Be a single-segment URL
-  //  - Not be excluded
-  //  - Not be a category
+  // article detection for your routing: "/:slug"
   const segments = path.split("/").filter(Boolean);
-  const isArticle =
-    segments.length === 1 && !isStaticExcluded && !isCategory;
+  const isArticle = segments.length === 1 && !isStaticExcluded && !isCategory;
 
   let meta = null;
+  let schemaJsonLd = null;
 
-  // ---------- FETCH WORDPRESS ARTICLE ----------
   if (isArticle) {
     const slug = segments[0];
 
     try {
+      // Use _embed so WP returns author and featured media when available
       const postRes = await fetch(
-        `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${slug}`
+        `https://app.janjagaran.com/wp-json/wp/v2/posts?slug=${encodeURIComponent(slug)}&_embed`
       );
       const posts = await postRes.json();
 
@@ -51,104 +56,135 @@ export const onRequest = async ({ request, next }) => {
 
         const title = post.title?.rendered || "Janjagaran News";
 
-        // Fetch featured media
+        // Try to get featured image from _embedded first
         let image = null;
 
-        if (post.featured_media) {
+        try {
+          // check embedded featured media
+          const embeddedMedia = post._embedded?.["wp:featuredmedia"]?.[0];
+          if (embeddedMedia) {
+            image = embeddedMedia.source_url || embeddedMedia.media_details?.sizes?.full?.source_url || null;
+          }
+        } catch (e) {}
+
+        // fallback to featured_media endpoint if embedded missing
+        if (!image && post.featured_media) {
           try {
             const mediaRes = await fetch(
               `https://app.janjagaran.com/wp-json/wp/v2/media/${post.featured_media}`
             );
             const media = await mediaRes.json();
-
             image =
               media.source_url ||
               media.media_details?.sizes?.full?.source_url ||
               null;
-
-            // Rewrite app → cdn
-            if (
-              image &&
-              image.startsWith("https://app.janjagaran.com")
-            ) {
-              image = image.replace(
-                "https://app.janjagaran.com",
-                "https://cdn.janjagaran.com"
-              );
-            }
           } catch (e) {}
+        }
+
+        // rewrite app -> cdn
+        if (image && image.startsWith("https://app.janjagaran.com")) {
+          image = image.replace("https://app.janjagaran.com", "https://cdn.janjagaran.com");
         }
 
         if (!image) image = DEFAULT_OG;
 
-        const desc =
-          post.excerpt?.rendered?.replace(/<[^>]+>/g, "") ||
-          "Latest Odisha news from Janjagaran";
+        const desc = post.yoast_head_json?.og_description
+          || (post.excerpt?.rendered?.replace(/<[^>]+>/g, "") || "").trim()
+          || "Latest Odisha news from Janjagaran";
 
-        meta = { title, image, desc };
+        // optional structured data fields
+        const datePublished = post.date || null;
+        const authorName = post._embedded?.author?.[0]?.name || null;
+
+        meta = { title, image, desc, datePublished, authorName, slug };
+
+        // build Article JSON-LD schema
+        schemaJsonLd = {
+          "@context": "https://schema.org",
+          "@type": "NewsArticle",
+          "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": url.href
+          },
+          "headline": title,
+          "image": [image],
+          "datePublished": datePublished || undefined,
+          "author": authorName ? { "@type": "Person", "name": authorName } : undefined,
+          "publisher": {
+            "@type": "Organization",
+            "name": "Janjagaran",
+            "logo": {
+              "@type": "ImageObject",
+              "url": DEFAULT_OG
+            }
+          },
+          "description": desc
+        };
       }
-    } catch (e) {}
+    } catch (e) {
+      // ignore fetch errors
+    }
   }
 
-  // ---------- META REPLACEMENT ----------
+  // ---------- REPLACE / INJECT META ----------
+  // Replace title + OG + Twitter fields if present in template
   if (meta) {
     const safeTitle = meta.title.replace(/"/g, "");
+    const safeDesc = (meta.desc || "").replace(/"/g, "");
 
     html = html
-      // Title
       .replace(/<title>(.*?)<\/title>/gi, `<title>${safeTitle}</title>`)
+      .replace(/property="og:title" content="(.*?)"/gi, `property="og:title" content="${safeTitle}"`)
+      .replace(/property="twitter:title" content="(.*?)"/gi, `property="twitter:title" content="${safeTitle}"`)
+      .replace(/property="og:description" content="(.*?)"/gi, `property="og:description" content="${safeDesc}"`)
+      .replace(/property="twitter:description" content="(.*?)"/gi, `property="twitter:description" content="${safeDesc}"`)
+      .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${meta.image}"`)
+      .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${meta.image}"`);
 
-      // OG Title
-      .replace(
-        /property="og:title" content="(.*?)"/gi,
-        `property="og:title" content="${safeTitle}"`
-      )
+    // inject canonical, schema, and OG block if not present or to ensure presence
+    const canonicalTag = `<link rel="canonical" href="${url.href}">`;
+    const ogBlock = `
+<link rel="canonical" href="${url.href}">
+<meta property="og:title" content="${safeTitle}">
+<meta property="og:description" content="${safeDesc}">
+<meta property="og:image" content="${meta.image}">
+<meta property="og:url" content="${url.href}">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${safeTitle}">
+<meta name="twitter:description" content="${safeDesc}">
+<meta name="twitter:image" content="${meta.image}">
+`;
 
-      // Twitter Title
-      .replace(
-        /property="twitter:title" content="(.*?)"/gi,
-        `property="twitter:title" content="${safeTitle}"`
-      )
+    // inject JSON-LD schema
+    const schemaTag = `<script type="application/ld+json">${JSON.stringify(schemaJsonLd)}</script>`;
 
-      // Image
-      .replace(
-        /property="og:image" content="(.*?)"/gi,
-        `property="og:image" content="${meta.image}"`
-      )
-      .replace(
-        /property="twitter:image" content="(.*?)"/gi,
-        `property="twitter:image" content="${meta.image}"`
-      )
-
-      // Description
-      .replace(
-        /property="og:description" content="(.*?)"/gi,
-        `property="og:description" content="${meta.desc}"`
-      )
-      .replace(
-        /property="twitter:description" content="(.*?)"/gi,
-        `property="twitter:description" content="${meta.desc}"`
-      );
+    // Insert canonical/OG/schema before </head>
+    if (html.includes("</head>")) {
+      // ensure we don't duplicate canonical if already present (best-effort)
+      html = html.replace("</head>", ogBlock + schemaTag + "</head>");
+    } else {
+      html = ogBlock + schemaTag + html;
+    }
   } else {
-    // ---------- DEFAULT OG ----------
+    // not an article -> ensure default OG images for excluded pages
     html = html
-      .replace(
-        /property="og:image" content="(.*?)"/gi,
-        `property="og:image" content="${DEFAULT_OG}"`
-      )
-      .replace(
-        /property="twitter:image" content="(.*?)"/gi,
-        `property="twitter:image" content="${DEFAULT_OG}"`
-      );
+      .replace(/property="og:image" content="(.*?)"/gi, `property="og:image" content="${DEFAULT_OG}"`)
+      .replace(/property="twitter:image" content="(.*?)"/gi, `property="twitter:image" content="${DEFAULT_OG}"`);
+
+    // Also inject canonical for homepage and static pages
+    const canonicalTag = `<link rel="canonical" href="${url.href}">`;
+    if (html.includes("</head>")) {
+      html = html.replace("</head>", canonicalTag + "</head>");
+    } else {
+      html = canonicalTag + html;
+    }
   }
 
-  // ---------- CDN REWRITE ----------
-  html = html.replace(
-    /https:\/\/app\.janjagaran\.com/gi,
-    "https://cdn.janjagaran.com"
-  );
+  // ---------- GLOBAL CDN REWRITE ----------
+  html = html.replace(/https:\/\/app\.janjagaran\.com/gi, "https://cdn.janjagaran.com");
 
-  // ---------- COPY / RIGHT-CLICK DISABLE ----------
+  // ---------- COPY PROTECTION (unchanged) ----------
   const protect = `
 <style>
   html, body, * { user-select: none !important; }
@@ -184,8 +220,34 @@ export const onRequest = async ({ request, next }) => {
     html = protect + html;
   }
 
-  const headers = new Headers(res.headers);
+  // ---------- BUILD RESPONSE HEADERS ----------
+  const headers = new Headers(originResponse.headers);
+
+  // preload header for article image
+  if (meta && meta.image) {
+    const preload = `<${meta.image}>; rel=preload; as=image`;
+    // if Link already exists, append
+    const existingLink = headers.get("Link");
+    headers.set("Link", existingLink ? existingLink + ", " + preload : preload);
+  }
+
+  // add Cache-Control for the client and edge
+  headers.set("Cache-Control", "public, max-age=60, s-maxage=300");
+
+  // remove content-length because HTML changed
   headers.delete("content-length");
 
-  return new Response(html, { status: res.status, headers });
+  const finalResp = new Response(html, {
+    status: originResponse.status,
+    headers
+  });
+
+  // cache transformed response at edge (best-effort)
+  try {
+    await caches.default.put(cacheKey, finalResp.clone());
+  } catch (e) {
+    // ignore cache put errors
+  }
+
+  return finalResp;
 };
