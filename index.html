@@ -100,5 +100,24 @@
 
     <!-- ✅ Correct Vite entry -->
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+  document.addEventListener("copy", e => e.preventDefault(), true);
+  document.addEventListener("cut", e => e.preventDefault(), true);
+  document.addEventListener("contextmenu", e => e.preventDefault(), true);
+  document.addEventListener("selectstart", e => e.preventDefault(), true);
+  document.addEventListener("dragstart", e => e.preventDefault(), true);
+
+  window.addEventListener("keydown", e => {
+    const k = e.key.toLowerCase();
+    const c = e.ctrlKey || e.metaKey;
+    if (c && ["c", "s", "u", "p", "a"].includes(k)) e.preventDefault();
+    if (e.keyCode === 123) e.preventDefault();
+  });
+
+  setInterval(() => {
+    const s = window.getSelection();
+    if (s && s.toString().length) s.removeAllRanges();
+  }, 150);
+</script>
   </body>
 </html>

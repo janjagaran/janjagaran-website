@@ -396,7 +396,8 @@ const ArticleDetails = () => {
             rel="noopener noreferrer"
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
           >
-            <i className="fa-brands fa-facebook-f text-xl"></i>
+            {/* <i className="fa-brands fa-facebook-f text-xl"></i> */}
+            <img src="/facebook.svg" alt="facebook" />
           </a>
 
           {/* Twitter */}
@@ -408,7 +409,8 @@ const ArticleDetails = () => {
             rel="noopener noreferrer"
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
           >
-            <i className="fa-brands fa-twitter text-xl"></i>
+            {/* <i className="fa-brands fa-twitter text-xl"></i> */}
+            <img src="/twitter.svg" className="h-[50px]" alt="twitter" />
           </a>
 
           {/* WhatsApp */}
@@ -418,7 +420,8 @@ const ArticleDetails = () => {
             rel="noopener noreferrer"
             className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition"
           >
-            <i className="fa-brands fa-whatsapp text-xl"></i>
+            {/* <i className="fa-brands fa-whatsapp text-xl"></i> */}
+            <img src="/whatsapp.svg" alt="whatsapp" />
           </a>
         </div>
       </div>

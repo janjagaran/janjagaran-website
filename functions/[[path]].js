@@ -29,7 +29,9 @@ export async function onRequest(context) {
   const post = postData[0];
 
   // Fetch featured image (OG Image)
-  let ogImage = "https://janjagaran.com/default-og.jpg";
+  
+//   let ogImage = "https://janjagaran.com/default-og.jpg";
+  let ogImage = "https://cdn.janjagaran.com/wp-content/uploads/2025/11/og-janjagaran.jpg"
   if (post.featured_media) {
     const mediaRes = await fetch(
       `https://app.janjagaran.com/wp-json/wp/v2/media/${post.featured_media}`
