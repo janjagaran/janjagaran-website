@@ -35,27 +35,55 @@
 // })
 
 
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import tailwindcss from '@tailwindcss/vite'
-import million from "million/compiler";
+//import { defineConfig } from 'vite'
+//import react from '@vitejs/plugin-react'
+//import tailwindcss from '@tailwindcss/vite'
+//import million from "million/compiler";
+
+//export default defineConfig({
+//  plugins: [
+//    million.vite(),   // ✅ MUST be first for optimization
+//    react(),
+//    tailwindcss(),
+//  ],
+  
+//  optimizeDeps: {
+//    include: ['react-icons/fa', 'react-icons/fa6'],  
+//   esbuildOptions: {
+//      ignoreAnnotations: true,
+//    },
+//  },
+
+//  build: {
+//    outDir: 'dist',
+//    rollupOptions: {
+//      external: [],
+//    },
+//    commonjsOptions: {
+//      include: [/react-icons/, /node_modules/],
+//    },
+//  },
+//})
+
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [
-    million.vite(),   // ✅ MUST be first for optimization
     react(),
     tailwindcss(),
   ],
-  
+
   optimizeDeps: {
-    include: ['react-icons/fa', 'react-icons/fa6'],  
+    include: ["react-icons/fa", "react-icons/fa6"],
     esbuildOptions: {
       ignoreAnnotations: true,
     },
   },
 
   build: {
-    outDir: 'dist',
+    outDir: "dist",
     rollupOptions: {
       external: [],
     },
@@ -63,4 +91,4 @@ export default defineConfig({
       include: [/react-icons/, /node_modules/],
     },
   },
-})
+});
